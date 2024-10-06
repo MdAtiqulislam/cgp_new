@@ -52,7 +52,7 @@ class EmptyCartView extends GetView<MyCartController> {
           childCount: controller.recommendedProducts.length,
               (buildContext, index) {
             return SingleGridItem(
-              index: index,
+             // index: index,
               product: controller.recommendedProducts[index],
               onTap: () {
                 Get.put(ProductDetailsController());

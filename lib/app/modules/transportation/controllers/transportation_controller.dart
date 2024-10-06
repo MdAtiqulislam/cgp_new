@@ -1,4 +1,5 @@
 
+
 import 'package:cgp/app/modules/cart/checkOut/models/address_model.dart';
 import 'package:cgp/app/modules/paymentPage/controllers/payment_page_controller.dart';
 import 'package:cgp/app/modules/transportation/models/transportation_calculation_model.dart';
@@ -8,6 +9,7 @@ import 'package:cgp/app/routes/app_pages.dart';
 import 'package:cgp/common_widgets/custom_snackbar.dart';
 import 'package:cgp/constraints/app_strings.dart';
 import 'package:cgp/models/customer_model.dart';
+import 'package:cgp/models/logged_in_customer_profile_model.dart';
 import 'package:cgp/models/single_address_model.dart';
 import 'package:cgp/other_controllers/floating_controller.dart';
 import 'package:cgp/services/api_endpoints.dart';
@@ -23,6 +25,7 @@ import 'package:get/get.dart';
 
 import '../../../../other_controllers/appbar_controller.dart';
 import '../../notifications/controllers/notifications_controller.dart';
+import '../../orderHistory/controllers/order_history_controller.dart';
 import '../../orderHistory/models/order_history_model.dart';
 
 class TransportationController extends GetxController {
@@ -75,6 +78,7 @@ class TransportationController extends GetxController {
  var selectedOrderFor="For Myself".obs;
 
   var onGoingRequests = OrderHistoryModel().obs;
+  var loggedInCustomerProfileModel=LoggedInCustomerProfileModel().obs;
 
  var customer=CustomerModel().obs;
 
@@ -174,7 +178,7 @@ class TransportationController extends GetxController {
        pickUpFirstNameController.text = selectedPickupAddress.value.firstName??"";
        pickUpLastNameController.text = selectedPickupAddress.value.lastName??"";
        pickUpPhoneController.text = selectedPickupAddress.value.phoneNumber1??"";
-       pickUpCountryController.text = selectedPickupAddress.value.countryId??"";
+       pickUpCountryController.text = "AU";//selectedPickupAddress.value.countryId??"";
        pickUpStateController.text = selectedPickupAddress.value.state??"";
        pickUpCityController.text = selectedPickupAddress.value.city??"";
        pickUpZipController.text = selectedPickupAddress.value.postalCode??"";
@@ -186,7 +190,7 @@ class TransportationController extends GetxController {
 
       pickupPlaceMark.value = await LocationServices.getPlaceMarksFromLatLng(
           lat: pickupPoint[1].toString(), lng: pickupPoint[2].toString());
-      pickUpCountryController.text = pickupPlaceMark.first.country ?? "";
+      pickUpCountryController.text = "AU";//pickupPlaceMark.first.country ?? "";
       pickUpZipController.text = pickupPlaceMark.first.postalCode ?? "";
       pickUpAddressController.text = pickupPlaceMark.first.street ?? "";
     }
@@ -194,7 +198,7 @@ class TransportationController extends GetxController {
       deliveryFirstNameController.text = selectedShippingAddress.value.firstName??"";
       deliveryLastNameController.text = selectedShippingAddress.value.lastName??"";
       deliveryPhoneController.text = selectedShippingAddress.value.phoneNumber1??"";
-      deliveryCountryController.text = selectedShippingAddress.value.countryId??"";
+      deliveryCountryController.text = "AU";//selectedShippingAddress.value.countryId??"";
       deliveryStateController.text = selectedShippingAddress.value.state??"";
       deliveryCityController.text = selectedShippingAddress.value.city??"";
       deliveryZipController.text = selectedShippingAddress.value.postalCode??"";
@@ -209,7 +213,7 @@ class TransportationController extends GetxController {
       destinationPlaceMark.value = await LocationServices.getPlaceMarksFromLatLng(
           lat: destinationPoint[1].toString(),
           lng: destinationPoint[2].toString());
-      deliveryCountryController.text = destinationPlaceMark.first.country ?? "";
+      deliveryCountryController.text = "AU";//destinationPlaceMark.first.country ?? "";
       deliveryZipController.text = destinationPlaceMark.first.postalCode ?? "";
       deliveryAddressController.text = destinationPlaceMark.first.street ?? "";
 
@@ -238,7 +242,7 @@ class TransportationController extends GetxController {
         "city": pickUpCityController.text,
         "state": pickUpStateController.text,
         "postal_code": pickUpZipController.text,
-        "country_id": pickupPlaceMark.first.country,
+        "country_id": "AU",//pickupPlaceMark.first.country,
         "latitude": pickupPoint[1],
         "longitude":pickupPoint[2],
         "notes": "",
@@ -259,7 +263,7 @@ class TransportationController extends GetxController {
         "city": deliveryCityController.text,
         "state": deliveryStateController.text,
         "postal_code": deliveryZipController.text,
-        "country_id": destinationPlaceMark.first.country,
+        "country_id": "AU",//destinationPlaceMark.first.country,
         "latitude": destinationPoint[1],
         "longitude":destinationPoint[2],
         "notes": "",
@@ -281,7 +285,7 @@ class TransportationController extends GetxController {
         "city": pickUpCityController.text,
         "state": pickUpStateController.text,
         "postal_code": pickUpZipController.text,
-        "country_id": pickUpCountryController.text,
+        "country_id": "AU",//pickUpCountryController.text,
         "latitude": selectedPickupAddress.value.latitude??pickupPoint[1].toString(),
         "longitude": selectedPickupAddress.value.longitude??pickupPoint[2].toString(),
         "notes": "",
@@ -298,9 +302,9 @@ class TransportationController extends GetxController {
         "city": deliveryCityController.text,
         "state": deliveryStateController.text,
         "postal_code": deliveryZipController.text,
-        "country_id": destinationController.text,
+        "country_id": "AU",//destinationController.text,
         "latitude":selectedShippingAddress.value.latitude?? destinationPoint[1].toString(),
-        "longitude":selectedPickupAddress.value.longitude?? destinationPoint[2].toString(),
+        "longitude":selectedShippingAddress.value.longitude?? destinationPoint[2].toString(),
         "notes": "",
         "address_type": "shipping",
         "is_default": true
@@ -344,6 +348,7 @@ class TransportationController extends GetxController {
         Get.put(FloatingController());
        // Get.find<FloatingController>().initializeSocket();
 
+        Get.find<FloatingController>().activeProgress.value=0;
         Get.find<FloatingController>().orderId.value=(transportationOrderModel.data?.order?.id).toString();
         Get.find<FloatingController>().showFloating();
         await LocalServices.storeOnGoingTrip((transportationOrderModel.data?.order?.id).toString());
@@ -408,6 +413,43 @@ Future<void>  getCustomerData()async {
 
   Future<bool> pendingOrder() async {
     isLoading.value = true;
+    var endPoint = APIEndPoints.loggedInCustomerProfile;
+    try {
+      var response = await RemoteServices.getRequest(endPoint: endPoint);
+      if (response != null) {
+        loggedInCustomerProfileModel.value=LoggedInCustomerProfileModel.fromJson(response);
+
+        await LocalServices().storeUser(loggedInCustomerProfileModel.value.data??CustomerModel());
+        // var result = checkRequest(onGoingRequests);
+        if (loggedInCustomerProfileModel.value.data?.ongoingDelivery!=null) {
+          CustomSnackBar(
+              msg: "You have an active order right now.\nPlease complete the order first.",
+              isSuccess: false,
+              showButton: true,
+              buttonText: "Goto orders",
+              onTap: () {
+                Get.back();
+                Get.put(OrderHistoryController()).getOrderHistory();;
+                Get.toNamed(Routes.ORDER_HISTORY);
+              }
+          ).showSnackBar();
+        }
+        return loggedInCustomerProfileModel.value.data?.ongoingDelivery!=null;
+      }
+    } catch (e) {
+      // Handle any potential exceptions
+      if (kDebugMode) {
+        print("Error fetching order history: $e");
+      }
+    } finally {
+      isLoading.value = false;
+    }
+    return false;
+  }
+
+
+/*  Future<bool> pendingOrder() async {
+    isLoading.value = true;
     var endPoint = APIEndPoints.orderHistory;
 
     try {
@@ -440,7 +482,10 @@ Future<void>  getCustomerData()async {
       isLoading.value = false;
     }
     return false;
-  }
+  }*/
+
+
+
 
   void getNotificationData() {
     Get.put(AppbarController());
@@ -457,13 +502,36 @@ Future<void>  getCustomerData()async {
       Get.find<NotificationsController>().getNotification();
       Get.toNamed(Routes.NOTIFICATIONS);
       Get.back();
-
       // Clear the saved data
       await storage.delete(key: 'requestId');
       await storage.delete(key: 'notificationId');
     }
   }
 
+  Future<bool> checkDefaultPaymentMethod() async {
+    isLoading.value=true;
+    bool status = false;
+    const String endPoint = APIEndPoints.hasDefaultPaymentMethod;
+
+    try {
+      var response = await RemoteServices.getRequest(endPoint: endPoint);
+      if (response != null && response.containsKey("data")) {
+        status = response["data"] as bool;
+
+        if(!status){
+          CustomSnackBar(
+            isSuccess: false,
+            msg: "You did not added any payment method yet! Please add one to continue."
+          ).showSnackBar();
+          await Get.toNamed(Routes.PAYMENT_METHODS);
+        }
+      }
+    } finally  {
+      isLoading.value=false;
+    }
+
+    return status;
+  }
 
 
 }

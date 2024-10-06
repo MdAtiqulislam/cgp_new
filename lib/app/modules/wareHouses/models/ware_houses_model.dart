@@ -2,6 +2,8 @@
 //
 //     final wareHousesModel = wareHousesModelFromJson(jsonString);
 
+
+/*
 import 'dart:convert';
 
 
@@ -35,3 +37,39 @@ class WareHousesModel {
   };
 }
 
+*/
+// To parse this JSON data, do
+//
+//     final warehouseBranchesModel = warehouseBranchesModelFromJson(jsonString);
+
+import 'dart:convert';
+
+import 'package:cgp/models/single_warehouse_branch_model.dart';
+
+WarehouseBranchesModel warehouseBranchesModelFromJson(String str) => WarehouseBranchesModel.fromJson(json.decode(str));
+
+String warehouseBranchesModelToJson(WarehouseBranchesModel data) => json.encode(data.toJson());
+
+class WarehouseBranchesModel {
+  final String? status;
+  final String? message;
+  final List<SingleWarehouseBranchModel>? data;
+
+  WarehouseBranchesModel({
+    this.status,
+    this.message,
+    this.data,
+  });
+
+  factory WarehouseBranchesModel.fromJson(Map<String, dynamic> json) => WarehouseBranchesModel(
+    status: json["status"],
+    message: json["message"],
+    data: json["data"] == null ? [] : List<SingleWarehouseBranchModel>.from(json["data"]!.map((x) => SingleWarehouseBranchModel.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "message": message,
+    "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+  };
+}

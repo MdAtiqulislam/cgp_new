@@ -74,7 +74,7 @@ class AddOrUpdateAddressController extends GetxController {
       "city": cityController.text,
       "state": stateController.text,
       "postal_code": zipController.text,
-      "country_id": countryController.text,
+      "country_id": "AU",
       "latitude": 0,
       "longitude": 0,
       "notes": "",
@@ -143,7 +143,7 @@ class AddOrUpdateAddressController extends GetxController {
       "city": cityController.text,
       "state": stateController.text,
       "postal_code": zipController.text,
-      "country_id": countryController.text,
+      "country_id": "AU",
       "latitude": lat??"",
       "longitude": lan??"",
       "notes": "",
@@ -196,7 +196,6 @@ class AddOrUpdateAddressController extends GetxController {
   }
 
   void selectLocationAndBack() {
-    print(selectedAddress.value.address);
     SingleAddressModel value=selectedAddress.value;
     Get.back(result: value);
   }

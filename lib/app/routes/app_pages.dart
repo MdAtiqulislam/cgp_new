@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import 'package:cgp/app/modules/FAQPage/bindings/f_a_q_page_binding.dart';
+import 'package:cgp/app/modules/FAQPage/views/f_a_q_page_view.dart';
 import 'package:cgp/app/modules/addOrUpdateAddress/bindings/add_or_update_address_binding.dart';
 import 'package:cgp/app/modules/addOrUpdateAddress/views/add_or_update_address_view.dart';
 import 'package:cgp/app/modules/categorySearch/bindings/category_search_binding.dart';
@@ -50,6 +52,8 @@ import 'package:cgp/app/modules/splashScreen/bindings/splash_screen_binding.dart
 import 'package:cgp/app/modules/splashScreen/views/splash_screen_view.dart';
 import 'package:cgp/app/modules/support/bindings/support_binding.dart';
 import 'package:cgp/app/modules/support/views/support_view.dart';
+import 'package:cgp/app/modules/termsAndCondition/bindings/terms_and_condition_binding.dart';
+import 'package:cgp/app/modules/termsAndCondition/views/terms_and_condition_view.dart';
 import 'package:cgp/app/modules/trackOrder/bindings/track_order_binding.dart';
 import 'package:cgp/app/modules/trackOrder/views/track_order_view.dart';
 import 'package:cgp/app/modules/transportation/bindings/transportation_binding.dart';
@@ -58,6 +62,8 @@ import 'package:cgp/app/modules/verifyOTP/bindings/verify_o_t_p_binding.dart';
 import 'package:cgp/app/modules/verifyOTP/views/verify_o_t_p_view.dart';
 import 'package:cgp/app/modules/wareHouses/bindings/ware_houses_binding.dart';
 import 'package:cgp/app/modules/wareHouses/views/ware_houses_view.dart';
+import 'package:cgp/app/modules/warehouseSearch/bindings/warehouse_search_binding.dart';
+import 'package:cgp/app/modules/warehouseSearch/views/warehouse_search_view.dart';
 import 'package:cgp/app/modules/wishList/bindings/wish_list_binding.dart';
 import 'package:cgp/app/modules/wishList/views/wish_list_view.dart';
 
@@ -241,6 +247,21 @@ class AppPages {
       name: _Paths.CHAT_HISTORY,
       page: () => ChatHistoryView(),
       binding: ChatHistoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.F_A_Q_PAGE,
+      page: () => FAQPageView(),
+      binding: FAQPageBinding(),
+    ),
+    GetPage(
+      name: _Paths.TERMS_AND_CONDITION,
+      page: () => TermsAndConditionView(),
+      binding: TermsAndConditionBinding(),
+    ),
+    GetPage(
+      name: _Paths.WAREHOUSE_SEARCH,
+      page: () => WarehouseSearchView(),
+      binding: WarehouseSearchBinding(),
     ),
   ];
 }

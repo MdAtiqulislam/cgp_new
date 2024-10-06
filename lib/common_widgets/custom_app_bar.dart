@@ -1,3 +1,4 @@
+/*
 import 'package:cgp/constraints/app_strings.dart';
 import 'package:cgp/constraints/body_text.dart';
 import 'package:cgp/constraints/dimensions.dart';
@@ -13,11 +14,12 @@ import 'custom_circle_avatar.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool minimal;
+  final bool enableBackButton;
   final VoidCallback? openDrawer;
   final GlobalKey<ScaffoldState>? scaffoldKey;
 
   CustomAppBar(
-      {this.scaffoldKey, this.openDrawer, this.minimal = true, super.key});
+      {this.scaffoldKey, this.openDrawer, this.minimal = true, super.key,this.enableBackButton=false});
 
   final appBarController = Get.put(AppbarController());
 
@@ -36,9 +38,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            if(enableBackButton)IconButton(onPressed: (){Get.back();}, icon: const Icon(Icons.arrow_back,color: AppColors.primaryColor,)),
+
             minimal
-                ? const HeaderText(text: "TradeBar - Customer",color: AppColors.primaryColor,)
-                : const HeaderText(text: "TradeBar - Customer",color: AppColors.primaryColor,),
+                ? const HeaderText(text: "TradeBar - Customer",color: AppColors.primaryColor,size: 18,)
+                : const HeaderText(text: "TradeBar - Customer",color: AppColors.primaryColor,size: 18,),
             if (appBarController.isLoading.value)
               const BodyText(text: "Loading..."),
             minimal
@@ -133,6 +137,167 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
       ),
+    );
+  }
+
+  @override
+  Size get preferredSize => Size(Get.width, 70.h);
+}
+
+
+ */
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../constraints/app_colors.dart';
+import '../constraints/dimensions.dart';
+import '../constraints/app_strings.dart';
+import '../constraints/body_text.dart';
+import '../constraints/header_text.dart';
+import '../other_controllers/appbar_controller.dart';
+import 'custom_circle_avatar.dart';
+
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final bool minimal;
+  final bool? enableBackButton; // Change to nullable
+  final VoidCallback? openDrawer;
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+
+  CustomAppBar({
+    super.key,
+    this.scaffoldKey,
+    this.openDrawer,
+    this.minimal = true,
+    this.enableBackButton, // Nullable, let the widget decide
+  });
+
+  final appBarController = Get.put(AppbarController());
+
+  @override
+  Widget build(BuildContext context) {
+    bool canPop = enableBackButton ?? Navigator.of(context).canPop();
+
+    return Obx(
+      () => Container(
+        height: 70.h,
+        margin:
+            EdgeInsets.symmetric(horizontal: AppDimensions.horizontalPadding.w),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: AppColors.lineColor, width: 1.h),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            if (canPop)
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon:
+                    const Icon(Icons.arrow_back, color: AppColors.primaryColor),
+              ),
+            _buildTitle(),
+            if (appBarController.isLoading.value)
+              const BodyText(text: "Loading..."),
+            _buildRightContent(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return const Expanded(
+      // Use Expanded to prevent overflow
+      child: HeaderText(
+        text: "TradeBar - Customer",
+        color: AppColors.primaryColor,
+        size: 16,
+        align: TextAlign.start,
+        // overflow: TextOverflow.ellipsis, // Add ellipsis to prevent text overflow
+      ),
+    );
+  }
+
+  Widget _buildRightContent() {
+    if (minimal) {
+      return const BodyText(
+        text: "Account",
+        color: AppColors.primaryColor,
+        size: 10,
+        // overflow: TextOverflow.ellipsis, // Add ellipsis to prevent text overflow
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          _buildNotificationIcon(),
+          SizedBox(width: AppDimensions.widgetPadding.w),
+          _buildAvatar(),
+          SizedBox(width: AppDimensions.widgetPadding.w),
+          _buildMenuIcon(),
+        ],
+      );
+    }
+  }
+
+  Widget _buildNotificationIcon() {
+    return InkWell(
+      onTap: appBarController.openNotificationPage,
+      child: SizedBox(
+        height: 30,
+        width: 30,
+        child: Center(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Image.asset(AppImagePath.notificationIcon),
+              if (appBarController.unreadNotifications.value > 0)
+                Positioned(
+                  top: -5,
+                  right: -10,
+                  child: Container(
+                    height: 18,
+                    width: 18,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.errorColor,
+                    ),
+                    child: Center(
+                      child: BodyText(
+                        text: appBarController.unreadNotifications >= 10
+                            ? "9+"
+                            : "${appBarController.unreadNotifications}",
+                        color: Colors.white,
+                        size: 10,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvatar() {
+    return InkWell(
+      onTap: () => scaffoldKey?.currentState?.openDrawer(),
+      child:  CustomCircleAvatar(
+        width: 30,
+        height: 30,
+        image:appBarController.customer.value.url??"", // Consider passing this as a parameter for better reusability
+      ),
+    );
+  }
+
+  Widget _buildMenuIcon() {
+    return InkWell(
+      onTap: () => scaffoldKey?.currentState?.openDrawer(),
+      child: Image.asset(AppImagePath.menuBar, height: 30),
     );
   }
 

@@ -141,7 +141,7 @@ class MapController extends GetxController {
   Future<void> generateRoute({required LatLng origin,required LatLng destination}) async {
     polyLines.value={};
 
-    const String apiKey = 'AIzaSyCUqRnsyjWiluojL3z2-9VRoZ7ABubgbpE';
+    const String apiKey = 'AIzaSyBprY90fvqn9LQqEhe4mSIyDf1UekyT2Po';
     final String url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$apiKey';
 

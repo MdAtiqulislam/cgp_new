@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:io';
 
 import 'package:cgp/app/modules/orderHistory/controllers/order_history_controller.dart';
 import 'package:cgp/app/routes/app_pages.dart';
@@ -42,15 +42,24 @@ class MyDrawer extends StatelessWidget {
                       ),*/
                     Stack(
                       children: [
-                        CustomCircleAvatar(
-                          width: 70,
-                          height: 70,
-                          image:
-                              controller.customer.value.profileImageUrl ?? "",
-                          bgColor: AppColors.primaryColor.withOpacity(.5),
-                          fit: BoxFit.cover,
+                        Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              // color: AppColors.borderColor,
+                              color: Colors.black38,
+                              border:
+                              Border.all(color: AppColors.borderColor, width: 2)),
+                          child: CustomCircleAvatar(
+                            width: 70.r,
+                            height: 70.r,
+                            image:
+                                controller.customer.value.url ?? "",
+                            bgColor: AppColors.primaryColor.withOpacity(.5),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        Positioned(
+                        /*Positioned(
                             bottom: 0,
                             right: 0,
                             child: Container(
@@ -77,7 +86,7 @@ class MyDrawer extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                            ))
+                            ))*/
                       ],
                     ),
                     SizedBox(
@@ -99,11 +108,12 @@ class MyDrawer extends StatelessWidget {
                         text: "Home"),
                     drawerButton(
                         onTap: () {
-                          Get.offAllNamed(Routes.HOME);
+                          Get.back();
+                          Get.toNamed(Routes.HOME);
                         },
                         icon: const Icon(Icons.pages,size: 16,color: AppColors.iconColor,),
                         imageIcon: "",
-                        text: "Brows products"),
+                        text: "Marketplace"),
                     drawerButton(
                         onTap: () {
                           controller.openProfilePage();
@@ -131,8 +141,8 @@ class MyDrawer extends StatelessWidget {
                     drawerButton(
                         onTap: () {
                           Get.back();
-                          /*Get.put(OrderHistoryController());
-                        Get.find<OrderHistoryController>().getOrderHistory();*/
+                          Get.put(OrderHistoryController());
+                          Get.find<OrderHistoryController>().getOrderHistory();
                           Get.toNamed(Routes.ORDER_HISTORY);
                         },
                         imageIcon: AppImagePath.orderCart,
@@ -160,6 +170,16 @@ class MyDrawer extends StatelessWidget {
                     const Divider(),
                     drawerButton(
                         onTap: () {
+                          Get.back();
+                          Get.toNamed(Routes.TERMS_AND_CONDITION);
+                          //Get.toNamed(Routes.REVIEW_AND_RATINGS);
+                        },
+                        imageIcon: AppImagePath.infoIcon,
+                        text: "Terms And Condition"),
+                   drawerButton(
+                        onTap: () {
+                          Get.back();
+                          Get.toNamed(Routes.SUPPORT);
                           //Get.toNamed(Routes.REVIEW_AND_RATINGS);
                         },
                         imageIcon: AppImagePath.support,
@@ -169,15 +189,32 @@ class MyDrawer extends StatelessWidget {
                           Get.back();
                           Get.toNamed(Routes.CHAT_HISTORY);
                         },
-                        icon: Icon(Icons.chat,size: 16,color: AppColors.iconColor,),
+                        icon: const Icon(Icons.chat,size: 16,color: AppColors.iconColor,),
                         imageIcon: AppImagePath.support,
-                        text: "Chat History"),
+                        text: "Messages"),
+
+                    drawerButton(
+                        onTap: () {
+                          Get.back();
+                          Get.toNamed(Routes.F_A_Q_PAGE);
+                        },
+                        icon: const Icon(Icons.question_mark_rounded,size: 16,color: AppColors.iconColor,),
+                        imageIcon: AppImagePath.support,
+                        text: "How To"),
+                    Divider(),
                     drawerButton(
                         onTap: () {
                           controller.logOut();
                         },
                         imageIcon: AppImagePath.logoutIcon,
                         text: "Log out"),
+                    if(Platform.isIOS) drawerButton(
+                        onTap: () {
+                          controller.deleteAccount();
+                        },
+                        imageIcon:"",
+                        icon:const Icon(Icons.delete,color: AppColors.iconColor,size: 16,),
+                        text: "Delete Account"),
                   ],
                 ),
               ),
@@ -228,101 +265,4 @@ class MyDrawer extends StatelessWidget {
       ),
     );
   }
-
-/*  Widget choseImage() {
-    return Container(
-      // padding: EdgeInsets.symmetric(horizontal: Dimensions.horizontalPadding),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(15.r),
-              topLeft: Radius.circular(15.r),),),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            height:32.h,
-          ),
-          const HeaderText(
-            text: "Select an action",
-            color: AppColors.primaryColor,
-            size: 18,
-          ),
-          SizedBox(
-            height: 32.h//AppDimensions.widgetPaddingVer,
-          ),
-          const Divider(
-            thickness: 5,
-            color: AppColors.primaryColor,
-          ),
-          SizedBox(
-            height:32.h// AppDimensions.contentPaddingVer,
-          ),
-          Container(
-            margin: const EdgeInsets.all(5),
-            color: Colors.white,
-            child: Material(
-              child: InkWell(
-                onTap: () {
-                  controller.selectImage(source: ImageSource.camera);
-                },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal:24.w,// AppDimensions.horizontalPadding,
-                      vertical:24.h// AppDimensions.widgetPaddingVer
-                  ),
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        AppImagePath.cameraIcon,
-                        height: 40.h,
-                      ),
-                      SizedBox(
-                        width:24.w// AppDimensions.widgetPaddingHor,
-                      ),
-                      const HeaderText(text: "Open Camera"),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const Divider(),
-          // SizedBox(height: Dimensions.widgetPaddingVer,),
-          Container(
-            margin: const EdgeInsets.all(5),
-            color: Colors.white,
-            child: Material(
-              child: InkWell(
-                onTap: () {
-                  controller.selectImage(source: ImageSource.gallery);
-                },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal:24.w,// AppDimensions.horizontalPadding,
-                      vertical: 24.w//AppDimensions.widgetPaddingVer
-                  ),
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        AppImagePath.galleryIcon,
-                        height: 40.h,
-                      ),
-                      SizedBox(
-                        width:16.w// AppDimensions.widgetPaddingHor,
-                      ),
-                      const HeaderText(text: "Open Gallery"),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 32.h//AppDimensions.sectionPaddingVer,
-          )
-        ],
-      ),
-    );
-  }*/
 }

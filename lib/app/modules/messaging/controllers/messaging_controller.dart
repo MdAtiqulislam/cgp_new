@@ -44,7 +44,7 @@ class MessagingController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    customer.value=await LocalServices.getUser()??CustomerModel();
+   await getCustomer();
 
   }
 
@@ -59,7 +59,8 @@ class MessagingController extends GetxController {
 
   Future<void> sendMessage() async {
     final text = messageController.text;
-    var url="https://cgp.studypress.org/api/v1/messaging/ajax/send-message";
+    var url="${APIEndPoints.baseUrlMessaging}/api/v1/messaging/ajax/send-message";
+   // var url="https://cgp.studypress.org/api/v1/messaging/ajax/send-message";
     if (text.isNotEmpty) {
       var body={
         "sender_id":customer.value.userId,
@@ -94,10 +95,11 @@ class MessagingController extends GetxController {
     }
   }
  Future<void> loadPreviousMessage() async {
-
+await getCustomer();
    messages.value=[];
    isLoading.value=true;
-   var link="https://cgp.studypress.org/api/v1/messaging/ajax/get-message-list";
+   var link="${APIEndPoints.baseUrlMessaging}/api/v1/messaging/ajax/get-message-list";
+   //var link="https://cgp.studypress.org/api/v1/messaging/ajax/get-message-list";
    var parameters={
      "senderId": senderId??customer.value.userId.toString(),
      "receiverId": receiverId??orderDetails.value.data?.deliveryInfo?.rider?.userId.toString(),
@@ -144,4 +146,13 @@ class MessagingController extends GetxController {
       isLoading.value=false;
     }
  }
+
+Future<void>  getCustomer()async {
+    isLoading.value=true;
+  try {
+    customer.value=await LocalServices.getUser()??CustomerModel();
+  } finally {
+    isLoading.value=false;
+  }
+}
 }

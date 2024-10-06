@@ -35,6 +35,8 @@ class Data {
   final String? id;
   final String? name;
   final String? abnNumber;
+  final String? thumbnailUrl;
+  final String? logoUrl;
   final int? active;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -47,6 +49,8 @@ class Data {
     this.id,
     this.name,
     this.abnNumber,
+    this.thumbnailUrl,
+    this.logoUrl,
     this.active,
     this.createdAt,
     this.updatedAt,
@@ -60,6 +64,8 @@ class Data {
     id: json["id"],
     name: json["name"],
     abnNumber: json["abn_number"],
+    thumbnailUrl: json["thumbnail_url"],
+    logoUrl: json["logo_url"],
     active: json["active"],
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
@@ -74,6 +80,8 @@ class Data {
     "name": name,
     "abn_number": abnNumber,
     "active": active,
+    "thumbnail_url": thumbnailUrl,
+    "logo_url": logoUrl,
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),
     "main_branch": mainBranch?.toJson(),

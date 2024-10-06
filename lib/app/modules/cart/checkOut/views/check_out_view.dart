@@ -1,6 +1,7 @@
 import 'package:cgp/app/modules/cart/models/my_cart_model.dart';
 import 'package:cgp/common_widgets/app_button.dart';
 import 'package:cgp/common_widgets/custom_app_bar.dart';
+import 'package:cgp/common_widgets/custom_title.dart';
 import 'package:cgp/common_widgets/my_drawer.dart';
 import 'package:cgp/constraints/app_strings.dart';
 import 'package:cgp/constraints/body_text.dart';
@@ -72,17 +73,18 @@ class CheckOutView extends GetView<CheckOutController> {
                                     "From ${controller.cartList[0].product?.warehouses?[0].warehouseName ?? ""} (${controller.cartList.length} Items)",
                                 color: AppColors.primaryColor,
                                 size: 14,
+                                align: TextAlign.start,
                               ),
                             ),
                         ],
                       ),
                     ),
-                    SliverToBoxAdapter(
+                   /* SliverToBoxAdapter(
                       child: SizedBox(
                         height: AppDimensions.sectionPadding.h,
                       ),
-                    ),
-                    billingAddressSection(),
+                    ),*/
+                   // billingAddressSection(),
                     SliverToBoxAdapter(
                       child: SizedBox(
                         height: AppDimensions.sectionPadding.h,
@@ -222,7 +224,7 @@ class CheckOutView extends GetView<CheckOutController> {
     return SliverToBoxAdapter(
       child: Column(
         children: [
-          Row(
+/*          Row(
             children: [
               Expanded(
                 child: HeaderText(
@@ -240,7 +242,8 @@ class CheckOutView extends GetView<CheckOutController> {
           ),
           SizedBox(
             height: AppDimensions.sectionPadding.h,
-          ),
+          ),*/
+        CustomTitle(title: "Shipping Address"),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

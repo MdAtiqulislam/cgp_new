@@ -1,3 +1,5 @@
+
+import 'package:cgp/app/modules/customFloatingCartButton/custom_floating_cart_button.dart';
 import 'package:cgp/app/modules/home/views/single_grid_item.dart';
 import 'package:cgp/app/modules/home/views/single_ware_house.dart';
 import 'package:cgp/app/modules/productDetails/controllers/product_details_controller.dart';
@@ -12,34 +14,33 @@ import 'package:cgp/common_widgets/my_drawer.dart';
 import 'package:cgp/constraints/app_colors.dart';
 import 'package:cgp/constraints/body_text.dart';
 import 'package:cgp/constraints/dimensions.dart';
-import 'package:cgp/utils/utils.dart';
+import 'package:cgp/models/single_warehouse_branch_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import '../../../../models/single_product_model.dart';
-import '../../../../models/single_warehouse_model.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final homeController=Get.put(HomeController());
+  final homeController = Get.put(HomeController());
 
   HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        key: scaffoldKey,
-        appBar: CustomAppBar(
-          minimal: false,
-          scaffoldKey: scaffoldKey,
-        ),
-        drawer: MyDrawer(),
-        body: Obx(
-          () => Stack(
+      child: Obx(
+        () => Scaffold(
+          key: scaffoldKey,
+          appBar: CustomAppBar(
+            minimal: false,
+            scaffoldKey: scaffoldKey,
+          ),
+          drawer: MyDrawer(),
+          floatingActionButton:const CustomFloatingCartButton(),
+          body: Stack(
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -55,7 +56,8 @@ class HomeView extends GetView<HomeController> {
                       child: CustomSearchBar(
                         enabled: false,
                         onTap: () {
-                          Get.toNamed(Routes.SEARCH_PAGE);
+                         // Get.toNamed(Routes.SEARCH_PAGE);
+                          Get.toNamed(Routes.WAREHOUSE_SEARCH);
                         },
                       ),
                     ),
@@ -67,8 +69,9 @@ class HomeView extends GetView<HomeController> {
                     SliverToBoxAdapter(
                       child: CategoryDropdown(
                         dropdownSearchFieldController:
-                        homeController.dropDownController,
-                        data: homeController.homeDataModel.value.categories ?? [],
+                            homeController.dropDownController,
+                        data:
+                            homeController.homeDataModel.value.categories ?? [],
                         /* onChange: (value) {
                           controller.dropDownController.text = value;
                           Get.put(CategorySearchController());
@@ -126,7 +129,8 @@ class HomeView extends GetView<HomeController> {
           child: ListView.builder(
               // padding: const EdgeInsets.symmetric(horizontal: AppDimensions.horizontalPadding),
               itemExtent: 200,
-              itemCount: homeController.homeDataModel.value.warehouses?.length ?? 0,
+              itemCount:
+                  homeController.homeDataModel.value.warehouseBranches?.length ?? 0,
               // shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               itemBuilder: (buildContext, index) {
@@ -136,20 +140,12 @@ class HomeView extends GetView<HomeController> {
                     bottom: AppDimensions.contentPadding.h,
                   ),
                   child: SingleWareHouse(
-                    categoryList:
-                    homeController.homeDataModel.value.categories ?? [],
-                    index: index,
+                   distance:   controller.calculateDistance(
+                       lat: double.parse(homeController.homeDataModel.value.warehouseBranches?[index].branchInfo?.latitude??"0"),
+                       lan: double.parse(homeController.homeDataModel.value.warehouseBranches?[index].branchInfo?.longitude??"0")),
                     warehouse:
-                    homeController.homeDataModel.value.warehouses?[index] ??
-                            SingleWarehouseModel(),
-                    subTitle: "Interior Equipment, Landscape & Outdoor",
-                    address: "Lorem Ipsum Street, 01 Melbourne, Australia",
-                    // distance: "2 km away",
-                    distanceFuture: distanceFromMyLocation(
-                        latitude: homeController.homeDataModel.value
-                            .warehouses?[index].mainBranch?.latitude,
-                        longitude: homeController.homeDataModel.value
-                            .warehouses?[index].mainBranch?.longitude),
+                        homeController.homeDataModel.value.warehouseBranches?[index] ??
+                            SingleWarehouseBranchModel(),
                   ),
                 );
               }),
@@ -168,7 +164,7 @@ class HomeView extends GetView<HomeController> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.r),
           ),
-          child: BodyText(
+          child: const BodyText(
             text: "View More",
             size: 12,
             color: Colors.white,
@@ -187,12 +183,13 @@ class HomeView extends GetView<HomeController> {
         return SingleGridItem(
           product: homeController.homeDataModel.value.products?[index] ??
               SingleProductModel(),
-          index: index,
+         // index: index,
           onTap: () {
             Get.put(ProductDetailsController());
             Get.find<ProductDetailsController>().getDetails(
-                id: homeController.homeDataModel.value.products?[index].id ?? "");
-          /*  Get.find<ProductDetailsController>().categoryList.value =
+                id: homeController.homeDataModel.value.products?[index].id ??
+                    "");
+            /*  Get.find<ProductDetailsController>().categoryList.value =
                 controller.homeDataModel.value.categories ?? [];*/
             Get.toNamed(Routes.PRODUCT_DETAILS);
           },
@@ -200,9 +197,50 @@ class HomeView extends GetView<HomeController> {
       }),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 200,
-          childAspectRatio: .6,
+          childAspectRatio: .54,
           crossAxisSpacing: AppDimensions.contentPadding.w,
           mainAxisSpacing: AppDimensions.contentPadding.h),
     );
   }
+
+  Widget myFloatingButton() {
+    return Stack(
+      clipBehavior: Clip.none, // Allows the badge to overflow the button's boundary
+      children: [
+        FloatingActionButton(
+          shape: const CircleBorder(),
+          backgroundColor: AppColors.primaryColor,
+          child: const Icon(Icons.shopping_cart, color: Colors.white),
+          onPressed: () {
+            Get.toNamed(Routes.CART_DETAILS);
+          },
+        ),
+        Positioned(
+          right: 3,
+          top: -3,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+            constraints: const BoxConstraints(
+              minWidth: 16,
+              minHeight: 16,
+            ),
+            child: Text(
+              (controller.cartModel.value.data?.length ?? 0).toString(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
 }

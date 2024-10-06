@@ -19,6 +19,8 @@ class AppImagePath {
   static const cancelIcon="assets/icons/cancel_icon.png";
   static const messageIcon="assets/icons/messageIcon.png";
   static const deliveryVan="assets/icons/deliveryVan.png";
+  static const vehicleNumber="assets/icons/car-registration.png";
+  static const driver="assets/icons/driver.png";
   static const account="assets/icons/account.png";
   static const shoppingCart="assets/icons/shoppingCart.png";
   static const favourite="assets/icons/favourite.png";
@@ -52,6 +54,12 @@ class AppImagePath {
 
   static const expandMoreIcon="assets/icons/expand_more.png";
   static const expandLessIcon="assets/icons/expand_less.png";
+  static const infoIcon="assets/icons/info_icon.png";
+
+  static const warehouse="assets/icons/warehouse.png";
+  static const noImage="assets/images/no_image.png";
+
+  //static const infoIcon="assets/icons/info_icon.png";
 
   //static const mapIcon="assets/icons/map_icon.png";
 }

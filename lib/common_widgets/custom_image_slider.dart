@@ -1,107 +1,147 @@
-import 'package:cgp/constraints/dimensions.dart';
+import 'package:carousel_slider/carousel_options.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../constraints/app_colors.dart';
+import '../constraints/app_strings.dart';
+import '../constraints/dimensions.dart';
+import 'custom_network_image.dart';
+
+class ImageSliderController extends GetxController {
+  RxInt dotPosition = 0.obs;
+
+  void updatePosition(int index) {
+    dotPosition.value = index;
+  }
+}
 
 class CustomImageSlider extends StatelessWidget {
-  final List<String> items;
+  final List items;
   final double height;
   final bool autoPlay;
   final bool revers;
 
-  CustomImageSlider(
-      {super.key,
-      required this.items,
-      required this.height,
-      this.autoPlay = true,
-      this.revers = false});
+  CustomImageSlider({
+    super.key,
+    required this.items,
+    required this.height,
+    this.autoPlay = true,
+    this.revers = false,
+  });
 
-  var dotPosition = 0.obs;
+  final ImageSliderController controller = Get.put(ImageSliderController());
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          height: height,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppDimensions.borderRadius.r),
+        if (items.isEmpty)
+          Container(
+            height: height,
+            width: Get.width,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: const [
+                BoxShadow(color: Colors.black12, blurRadius: 2),
+              ],
+              borderRadius: BorderRadius.circular(AppDimensions.borderRadius.r),
+            ),
+            child: Image.asset(
+              AppImagePath.noImage,
+              fit: BoxFit.cover,
+            ),
           ),
-          child: Image.asset(items[0],fit: BoxFit.cover,),
-        ),
-        /*CarouselSlider(
+        CarouselSlider(
           items: items.map((i) {
             return Builder(
               builder: (BuildContext context) {
                 return Container(
-                    clipBehavior: Clip.hardEdge,
-                    width: MediaQuery.of(context).size.width,
-                    // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                    decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(
-                            AppDimensions.borderRadius.r)),
-                    child: Image.asset(
-                      i,
-                      fit: BoxFit.cover,
-                    ));
+                  width: Get.width,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black12, blurRadius: 2),
+                    ],
+                    borderRadius: BorderRadius.circular(AppDimensions.borderRadius.r),
+                  ),
+                  child: CustomNetworkImage(
+                    image: i,
+                    localImage: AppImagePath.noImage,
+                  ),
+                );
               },
             );
           }).toList(),
           options: CarouselOptions(
-            clipBehavior: Clip.hardEdge,
+            onPageChanged: (i, r) {
+              controller.updatePosition(i);
+            },
             height: height,
-            aspectRatio: 1,
             viewportFraction: 1,
-            initialPage: 1,
-            enableInfiniteScroll: false,
+            initialPage: 0,
+            enableInfiniteScroll: true,
             reverse: revers,
             autoPlay: autoPlay,
-            onPageChanged: (i, r) {
-              dotPosition.value = i;
-            },
+            autoPlayInterval: const Duration(seconds: 5),
+            autoPlayAnimationDuration: const Duration(milliseconds: 1000),
+            autoPlayCurve: Curves.fastOutSlowIn,
+            scrollDirection: Axis.horizontal,
           ),
-        )*/
-
-        Positioned(bottom: 0, left: 0, right: 0, child: dotIndicator())
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDimensions.horizontalPadding.w,
+              vertical: AppDimensions.verticalPadding.h,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(AppDimensions.borderRadius.r),
+                bottomRight: Radius.circular(AppDimensions.borderRadius.r),
+              ),
+              gradient: const LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black54,
+                  Colors.transparent,
+                ],
+              ),
+            ),
+            child: dotIndicator(),
+          ),
+        ),
       ],
     );
   }
 
   Widget dotIndicator() {
-    return Obx(() => Container(
-          padding: const EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(
-                    AppDimensions.borderRadius.r,
-                  ),
-                  bottomRight: Radius.circular(AppDimensions.borderRadius.r)),
-              gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [
-                    Colors.black.withOpacity(.5),
-                    Colors.transparent,
-                  ])),
-          child: Center(
-            child: DotsIndicator(
-              mainAxisAlignment: MainAxisAlignment.center,
-              dotsCount: items.length, //images.isEmpty ? 1 : images.length,
-              position: dotPosition.value,
-              decorator: DotsDecorator(
-                color: Colors.white,
-                activeColor: AppColors.primaryColor,
-                size: const Size.square(9.0),
-                activeSize: const Size(18.0, 9.0),
-                activeShape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0)),
-              ),
+    return Obx(
+          () => Center(
+        child: DotsIndicator(
+          dotsCount: items.isEmpty ? 1 : items.length,
+          position: controller.dotPosition.value,
+          decorator: DotsDecorator(
+           // color: Colors.white,
+            activeColor: AppColors.primaryColor,
+            size: const Size.square(9.0),
+            activeSize: const Size(25.0, 12),
+            activeShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5.0),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

@@ -14,6 +14,8 @@ class PaymentMethodsController extends GetxController {
 
   CardFieldInputDetails? cardDetails;
 
+  var isCardReady=false.obs;
+
   @override
   Future<void> onInit() async {
     super.onInit();

@@ -13,8 +13,8 @@ class SingleSearchItem extends StatelessWidget {
   final bool isFavourite;
   final bool isCart;
   final SingleProductModel product;
-  final Function()? onTapFavourite;
-  final Function()? onTapCart;
+  final Function() onTapFavourite;
+  final Function() onTapCart;
 
   const SingleSearchItem({
 
@@ -22,8 +22,8 @@ class SingleSearchItem extends StatelessWidget {
     required this.index,
     this.isCart=false,
     this.isFavourite=false,
-    this.onTapCart,
-    this.onTapFavourite,
+   required this.onTapCart,
+    required this.onTapFavourite,
     super.key});
 
   @override
@@ -148,7 +148,7 @@ class SingleSearchItem extends StatelessWidget {
                           fontSize: 12.sp),
                       children: [
                         TextSpan(
-                          text: "\$${product.productName}",
+                          text: "\$${product.salesPrice}",
                           style: TextStyle(
                               color: AppColors.primaryColor,
                               fontSize: 12.sp,
@@ -197,7 +197,7 @@ class SingleSearchItem extends StatelessWidget {
           ),
           Column(
             children: [
-              PopupMenuButton<int>(
+              /*PopupMenuButton<int>(
                 icon: Icon(Icons.more_horiz_outlined),
                 itemBuilder: (context) => [
                   PopupMenuItem(
@@ -275,9 +275,19 @@ class SingleSearchItem extends StatelessWidget {
                     value: 1,
                   ),
                 ],
+              ),*/
+              IconButton(
+                  icon: Icon(Icons.favorite_outline,color: AppColors.headerTextColor,size: 25.sp,),
+              onPressed: (){
+                    onTapFavourite();
+              },
               ),
-              if(isFavourite)Icon(Icons.favorite_outlined,color: AppColors.headerTextColor,size: 15.sp,),
-              if(isCart)Icon(Icons.shopping_cart,color: AppColors.headerTextColor,size: 15.sp,),
+              IconButton(icon: Icon(Icons.shopping_cart,color: AppColors.headerTextColor,size: 25.sp,),
+              onPressed: (){
+                onTapCart();
+              },
+              ),
+
             ],
 
           ),

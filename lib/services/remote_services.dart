@@ -369,6 +369,49 @@ class RemoteServices {
     }
   }
 
+
+  static Future<dynamic> getRequestForResponseBody({
+    required String endPoint,
+    Map<String, dynamic>? body,
+    Map<String, dynamic>? parameters,
+  }) async {
+     token = await LocalServices.getToken() ?? "";
+
+    final Map<String, String> headers = {
+      "Authorization": "Bearer $token",
+    };
+
+
+    try {
+      final Uri uri = Uri.parse(baseURL + endPoint).replace(
+        queryParameters: parameters,
+      );
+      if (kDebugMode) {
+        print("GET Request URL: $uri");
+        print("Token: $token");
+      }
+
+      final http.Response response = await client.get(uri, headers: headers);
+      if(isHttpStatusSuccess(response.statusCode)) {
+        return json.decode(response.body);
+      } else {
+        return null;
+      }
+
+
+      return response.body;
+    } on Exception catch (e) {
+      AppStrings.httpErrorMSG.value = AppStrings.generalHttpErrorMSG;
+      if (kDebugMode) {
+        print("Error in GET request: $e");
+      }
+      return null;
+    }
+  }
+
+
+
+
   static Future<dynamic> getRequestLoadMore({
     required String url,
     Map<String, dynamic>? body,

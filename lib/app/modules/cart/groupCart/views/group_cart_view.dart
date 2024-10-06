@@ -87,7 +87,7 @@ class GroupCartView extends GetView<GroupCartController> {
       delegate:
           SliverChildBuilderDelegate(childCount: 9, (buildContext, index) {
         return SingleGridItem(
-          index: index,
+         // index: index,
           onTap: () {
             Get.toNamed(Routes.PRODUCT_DETAILS);
           },

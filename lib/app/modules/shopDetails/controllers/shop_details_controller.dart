@@ -1,26 +1,35 @@
 import 'package:cgp/app/modules/home/models/home_data_model.dart';
+import 'package:cgp/app/modules/shopDetails/models/products_by_branch_model.dart';
 import 'package:cgp/app/modules/shopDetails/models/products_by_category_model.dart';
 import 'package:cgp/app/modules/shopDetails/models/products_by_ware_house_model.dart';
 import 'package:cgp/app/modules/shopDetails/models/ware_house_details_model.dart';
+import 'package:cgp/app/modules/shopDetails/models/warehouse_branch_details_model.dart';
 import 'package:cgp/models/single_address_model.dart';
 import 'package:cgp/services/api_endpoints.dart';
 import 'package:cgp/services/remote_services.dart';
+import 'package:cgp/utils/enams.dart';
 import 'package:cgp/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 class ShopDetailsController extends GetxController {
   var isLoading = false.obs;
+  var branchType="".obs;
+  var wareHouseId="".obs;
+  var branchId="".obs;
+
   var isLoadingProduct = true.obs;
   var categoryList = <Category>[].obs;
   var dropDownController = TextEditingController();
-
   String shopName = "";
 
-  var selectedIndex = 0.obs;
   var wareHouseDetails = WareHouseDetailsModel().obs;
-  var productsByCategory = ProductsByCategoryModel().obs;
-  var productsByWareHouse = ProductsByWareHouseModel().obs;
+  var wareHouseBranchDetails = WareHouseBranchDetailsModel().obs;
+
+ // var productsByCategoryf = ProductsByCategoryModel().obs;
+ // var productsByWareHouse = ProductsByWareHouseModel().obs;
+  var products = ProductByWarehouseBranchModel().obs;
+
   var distance = "".obs;
   var selectedShippingAddress=SingleAddressModel().obs;
   var isSelfPickup=true.obs;
@@ -34,36 +43,37 @@ class ShopDetailsController extends GetxController {
   @override
   void onClose() {}
 
-  void getDetails({required String id}) async {
+  void getWarehouseDetails() async {
     isLoading.value = true;
-    var endPoint = "${APIEndPoints.wareHouseDetails}$id";
+    var endPoint ="${APIEndPoints.wareHouseDetails}${wareHouseId.value}";
     try {
       var response = await RemoteServices.getRequest(endPoint: endPoint);
       if (response != null) {
         wareHouseDetails.value = WareHouseDetailsModel.fromJson(response);
-        distance.value = await distanceFromMyLocation(
-                latitude: wareHouseDetails.value.data?.mainBranch?.latitude,
-                longitude:
-                    wareHouseDetails.value.data?.mainBranch?.longitude) ??
-            "";
       }
     } finally {
       isLoading.value = false;
     }
   }
 
-/*  void getCategory() async {
-    var endPoint = APIEndPoints.getCategory;
+  void getBranchDetails() async {
+    isLoading.value = true;
+    var endPoint ="${APIEndPoints.wareHouseBranchDetails}${branchId.value}";
     try {
       var response = await RemoteServices.getRequest(endPoint: endPoint);
       if (response != null) {
-        categoryList.value = CategoriesModel.fromJson(response);
-      //  getProductsByCategory(categoryId: categoryList.value.data?[0].id??"");
+        wareHouseBranchDetails.value = WareHouseBranchDetailsModel.fromJson(response);
+        distance.value = await distanceFromMyLocation(
+                latitude: wareHouseBranchDetails.value.data?.latitude,
+                longitude: wareHouseBranchDetails.value.data?.longitude) ?? "";
       }
-    } finally {}
-  }*/
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
-  void getProductsByCategory({required String categoryId}) async {
+
+  /*void getProductsByCategory({required String categoryId}) async {
     isLoadingProduct.value = true;
     var endPoint = APIEndPoints.getProductByCategory
         .replaceAll('{categoryId}', categoryId);
@@ -72,14 +82,22 @@ class ShopDetailsController extends GetxController {
       isLoadingProduct.value = false;
     });
   }
+*/
 
-  void getProductsByWareHouse({required String wareHouseId}) async {
+
+  void getProducts() async {
     isLoadingProduct.value = true;
-    var endPoint = APIEndPoints.getProductByWareHouse
-        .replaceAll('{warehouseId}', wareHouseId);
+/*    var endPoint =branchType.value==BranchType.headOffice.name
+        ?APIEndPoints.getProductByWareHouse
+        .replaceAll('{warehouseId}', branchId.value)
+        :APIEndPoints.getProductByWareHouseBranch
+        .replaceAll('{branchId}', branchId.value);*/
+
+    var endPoint=APIEndPoints.getProductByWareHouseBranch
+        .replaceAll('{branchId}', branchId.value);
     await RemoteServices.getRequest(endPoint: endPoint).then((value) {
       if (value!=null) {
-        productsByWareHouse.value = ProductsByWareHouseModel.fromJson(value);
+        products.value = ProductByWarehouseBranchModel.fromJson(value);
       }
       isLoadingProduct.value = false;
     });

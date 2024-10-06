@@ -38,6 +38,10 @@ abstract class Routes {
   static const MESSAGING = _Paths.MESSAGING;
   static const SUPPORT = _Paths.SUPPORT;
   static const CHAT_HISTORY = _Paths.CHAT_HISTORY;
+  static const F_A_Q_PAGE = _Paths.F_A_Q_PAGE;
+  static const TERMS_AND_CONDITION = _Paths.TERMS_AND_CONDITION;
+  static const WAREHOUSE_SEARCH = _Paths.WAREHOUSE_SEARCH;
+  static const WAREHOUSE_BRANCH_DETAILS = _Paths.WAREHOUSE_BRANCH_DETAILS;
 }
 
 abstract class _Paths {
@@ -75,4 +79,8 @@ abstract class _Paths {
   static const MESSAGING = '/messaging';
   static const SUPPORT = '/support';
   static const CHAT_HISTORY = '/chat-history';
+  static const F_A_Q_PAGE = '/f-a-q-page';
+  static const TERMS_AND_CONDITION = '/terms-and-condition';
+  static const WAREHOUSE_SEARCH = '/warehouse-search';
+  static const WAREHOUSE_BRANCH_DETAILS = '/warehouse-branch-details';
 }

@@ -186,13 +186,15 @@ double calculateDistance(CustomLocation start, CustomLocation end) {
 
 double calculateDistanceInMeter(LatLng start, LatLng end)
 {
-  return   Geolocator.distanceBetween(
-    start.latitude,
-    start.longitude,
-    end.latitude,
-    end.longitude,
-  );
 
+  print("$start  $end" );
+
+  return   Geolocator.distanceBetween(
+     start.latitude,
+     start.longitude,
+     end.latitude,
+     end.longitude,
+  );
 }
 
 
@@ -352,10 +354,10 @@ String formatDateTime({String? dateTimeToConvert}) {
       return formattedDate;
     } catch (e) {
       // Handle parsing error
-      return "Invalid-date";
+      return "--";
     }
   } else {
-    return "N/A";
+    return "--";
   }
 }
 

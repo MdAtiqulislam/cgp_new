@@ -36,7 +36,7 @@ class HeaderText extends StatelessWidget {
       textAlign: align,
       style: TextStyle(
         color: color,
-        fontSize:resizeable? size.sp:size,
+        fontSize:resizeable? size.spMin:size,
         fontWeight: fontWeight,
         height: lineHeight
       ),

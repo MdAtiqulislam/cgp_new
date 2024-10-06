@@ -13,7 +13,6 @@ import 'package:cgp/constraints/body_text.dart';
 import 'package:cgp/constraints/dimensions.dart';
 import 'package:cgp/constraints/header_text.dart';
 import 'package:cgp/models/single_address_model.dart';
-import 'package:cgp/other_controllers/floating_controller.dart';
 import 'package:cgp/utils/enams.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -38,6 +37,7 @@ class TransportationView extends GetView<TransportationController> {
           appBar: CustomAppBar(
             minimal: false,
             scaffoldKey: scaffoldKey,
+            enableBackButton: false,
           ),
           drawer: MyDrawer(),
           bottomNavigationBar: bottomNavBar(),
@@ -251,7 +251,6 @@ class TransportationView extends GetView<TransportationController> {
                     ? AppColors.inactiveColor
                     : AppColors.primaryColor,
                 onTap: () async {
-
                   if(!await controller. pendingOrder()){
                     controller.getAddressesData();
                     Get.bottomSheet(
@@ -479,11 +478,13 @@ class TransportationView extends GetView<TransportationController> {
         Expanded(
           child: InkWell(
             onTap: () async {
-              controller.selectedPickupAddress.value = SingleAddressModel();
-              await Get.toNamed(Routes.LOCATION_SEARCH)?.then((value) {
-                controller.pickupController.text = value[0];
-                controller.pickupPoint.value = value;
-              });
+              if (await controller.checkDefaultPaymentMethod()) {
+                controller.selectedPickupAddress.value = SingleAddressModel();
+                await Get.toNamed(Routes.LOCATION_SEARCH)?.then((value) {
+                  controller.pickupController.text = value[0];
+                  controller.pickupPoint.value = value;
+                });
+              }
             },
             child: CustomTextField(
               isEnable: false,
@@ -506,28 +507,30 @@ class TransportationView extends GetView<TransportationController> {
                   BorderRadius.circular(AppDimensions.borderRadius.r)),
           child: IconButton(
             onPressed: () async {
-              controller.isLoading.value = true;
-              Get.put(AddOrUpdateAddressController());
-              Get.find<AddOrUpdateAddressController>().isActiveSelectButton =
-                  true;
-              Get.find<AddOrUpdateAddressController>()
-                  .selectedAddressType
-                  .value = AddressType.pickup.name;
-              await Get.find<AddOrUpdateAddressController>()
-                  .getAddresses()
-                  .then((value) {
-                Get.find<AddOrUpdateAddressController>().getMySelectedAddress();
-              });
-              await Get.toNamed(Routes.ADD_OR_UPDATE_ADDRESS)?.then((value) {
-                controller.isLoading.value = false;
-                if (value != null) {
-                  Get.find<AddOrUpdateAddressController>()
-                      .isActiveSelectButton = false;
-                  controller.selectedPickupAddress.value = value;
-                  controller.pickupController.text =
-                      controller.selectedPickupAddress.value.address ?? "";
-                }
-              });
+              if(await controller.checkDefaultPaymentMethod()){
+                controller.isLoading.value = true;
+                Get.put(AddOrUpdateAddressController());
+                Get.find<AddOrUpdateAddressController>().isActiveSelectButton =
+                true;
+                Get.find<AddOrUpdateAddressController>()
+                    .selectedAddressType
+                    .value = AddressType.pickup.name;
+                await Get.find<AddOrUpdateAddressController>()
+                    .getAddresses()
+                    .then((value) {
+                  Get.find<AddOrUpdateAddressController>().getMySelectedAddress();
+                });
+                await Get.toNamed(Routes.ADD_OR_UPDATE_ADDRESS)?.then((value) {
+                  controller.isLoading.value = false;
+                  if (value != null) {
+                    Get.find<AddOrUpdateAddressController>()
+                        .isActiveSelectButton = false;
+                    controller.selectedPickupAddress.value = value;
+                    controller.pickupController.text =
+                        controller.selectedPickupAddress.value.address ?? "";
+                  }
+                });
+              }
             },
             icon: const Icon(
               Icons.map,
@@ -545,11 +548,13 @@ class TransportationView extends GetView<TransportationController> {
         Expanded(
           child: InkWell(
             onTap: () async {
-              controller.selectedShippingAddress.value = SingleAddressModel();
-              await Get.toNamed(Routes.LOCATION_SEARCH)?.then((value) {
-                controller.destinationController.text = value[0];
-                controller.destinationPoint.value = value;
-              });
+              if (await controller.checkDefaultPaymentMethod()) {
+                controller.selectedShippingAddress.value = SingleAddressModel();
+                await Get.toNamed(Routes.LOCATION_SEARCH)?.then((value) {
+                  controller.destinationController.text = value[0];
+                  controller.destinationPoint.value = value;
+                });
+              }
             },
             child: CustomTextField(
               isEnable: false,
@@ -572,29 +577,31 @@ class TransportationView extends GetView<TransportationController> {
                   BorderRadius.circular(AppDimensions.borderRadius.r)),
           child: IconButton(
             onPressed: () async {
-              controller.isLoading.value = true;
-              Get.put(AddOrUpdateAddressController());
-              Get.find<AddOrUpdateAddressController>().isActiveSelectButton =
-                  true;
-              Get.find<AddOrUpdateAddressController>()
-                  .selectedAddressType
-                  .value = AddressType.shipping.name;
-              await Get.find<AddOrUpdateAddressController>()
-                  .getAddresses()
-                  .then((value) {
-                Get.find<AddOrUpdateAddressController>().getMySelectedAddress();
-              });
-              await Get.toNamed(Routes.ADD_OR_UPDATE_ADDRESS)?.then((value) {
-                controller.isLoading.value = false;
-                if (value != null) {
-                  Get.find<AddOrUpdateAddressController>()
-                      .isActiveSelectButton = false;
-                  controller.selectedShippingAddress.value = value;
-                  controller.destinationController.text =
-                      controller.selectedShippingAddress.value.address ?? "";
-                }
-              });
+              if(await controller.checkDefaultPaymentMethod()){
+                controller.isLoading.value = true;
+                Get.put(AddOrUpdateAddressController());
+                Get.find<AddOrUpdateAddressController>().isActiveSelectButton =
+                true;
+                Get.find<AddOrUpdateAddressController>()
+                    .selectedAddressType
+                    .value = AddressType.shipping.name;
+                await Get.find<AddOrUpdateAddressController>()
+                    .getAddresses()
+                    .then((value) {
+                  Get.find<AddOrUpdateAddressController>().getMySelectedAddress();
+                });
+                await Get.toNamed(Routes.ADD_OR_UPDATE_ADDRESS)?.then((value) {
+                  controller.isLoading.value = false;
+                  if (value != null) {
+                    Get.find<AddOrUpdateAddressController>()
+                        .isActiveSelectButton = false;
+                    controller.selectedShippingAddress.value = value;
+                    controller.destinationController.text =
+                        controller.selectedShippingAddress.value.address ?? "";
+                  }
+                });
 
+              }
               // controller.getAddresses(type:AddressType.pickup.name);
               /* Get.bottomSheet(
                                       isScrollControlled: true,

@@ -1,4 +1,5 @@
 
+import 'package:cgp/constraints/body_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -23,15 +24,21 @@ class MessagingView extends GetView<MessagingController> {
           appBar: AppBar(
             title: Row(
               children: [
-                const CustomCircleAvatar(
+                 CustomCircleAvatar(
                   height: 30,
                   width: 30,
-                  image: "",
+                  image: controller.imageLink.value,
                 ),
                 SizedBox(
                   width: AppDimensions.contentPadding.w,
                 ),
-                HeaderText(text: controller.chatWith.value)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HeaderText(text: controller.chatWith.value),
+                    BodyText(text: "Vehicle Reg: ${controller.orderDetails.value.data?.deliveryInfo?.rider?.vehicleLicensePlate??""}")
+                  ],
+                )
               ],
             ),
           ),

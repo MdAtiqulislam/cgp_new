@@ -30,6 +30,7 @@ class AddOrUpdateAddressView extends GetView<AddOrUpdateAddressController> {
         key: scaffoldKey,
         appBar:  CustomAppBar(
           minimal: false,
+          enableBackButton: true,
           scaffoldKey: scaffoldKey,
         ),
         drawer: MyDrawer(),

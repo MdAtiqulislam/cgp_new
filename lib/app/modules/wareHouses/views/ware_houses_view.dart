@@ -1,6 +1,7 @@
 import 'package:cgp/app/modules/home/views/single_ware_house.dart';
 import 'package:cgp/common_widgets/custom_loading_screen.dart';
 import 'package:cgp/common_widgets/custom_title.dart';
+import 'package:cgp/models/single_warehouse_branch_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -11,11 +12,7 @@ import '../../../../common_widgets/custom_app_bar.dart';
 import '../../../../common_widgets/custom_search_bar.dart';
 import '../../../../common_widgets/my_drawer.dart';
 import '../../../../constraints/dimensions.dart';
-import '../../../../models/single_warehouse_model.dart';
-import '../../../../utils/utils.dart';
 import '../../../routes/app_pages.dart';
-import '../../home/models/home_data_model.dart';
-import '../../searchPage/controllers/search_page_controller.dart';
 import '../controllers/ware_houses_controller.dart';
 
 class WareHousesView extends GetView<WareHousesController> {
@@ -46,12 +43,16 @@ class WareHousesView extends GetView<WareHousesController> {
                 ),
                 SliverToBoxAdapter(
                   child: CustomSearchBar(
-                    enabled: false,
+                   /* enabled: false,
                     onTap: () {
                       Get.put(SearchPageController());
                       Get.find<SearchPageController>().searchController.text =
                           "";
                       Get.toNamed(Routes.SEARCH_PAGE);
+                    },*/
+                    enabled: false,
+                    onTap: () {
+                      Get.toNamed(Routes.WAREHOUSE_SEARCH);
                     },
                   ),
                 ),
@@ -92,24 +93,18 @@ class WareHousesView extends GetView<WareHousesController> {
                       childCount: controller.wareHouses.value.data?.length??0,
                             (buildContext, index) {
                       return SingleWareHouse(
-                        index: index,
-                        categoryList: controller.categoryList,
-                        warehouse: controller.wareHouses.value.data?[index] ?? SingleWarehouseModel(),
-                        subTitle: "Interior Equipment, Landscape & Outdoor",
-                        address: "Lorem Ipsum Street, 01 Melbourne, Australia",
-                        distanceFuture: distanceFromMyLocation(
-                      latitude: controller.wareHouses.value
-                          .data?[index].mainBranch?.latitude,
-                          longitude: controller.wareHouses.value
-                              .data?[index].mainBranch?.longitude),
+                        distance: controller.calculateDistance(
+                            lat: double.parse(controller.wareHouses.value.data?[index].branchInfo?.latitude??"0"),
+                            lan: double.parse(controller.wareHouses.value.data?[index].branchInfo?.longitude??"0")),
+                        warehouse: controller.wareHouses.value.data?[index] ?? SingleWarehouseBranchModel(),
 
                       );
                     }),
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                         maxCrossAxisExtent: 200,
                       mainAxisSpacing: 10,
                       crossAxisSpacing: 10,
-                      childAspectRatio: .5
+                      childAspectRatio: .54
 
                     )
                 ),

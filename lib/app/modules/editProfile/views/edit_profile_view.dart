@@ -38,7 +38,7 @@ class EditProfileView extends GetView<EditProfileController> {
           minimal: false,
         ),
         drawer: MyDrawer(),
-        body: Stack(
+        body: Obx(()=>Stack(
           children: [
             SingleChildScrollView(
               child: Padding(
@@ -56,7 +56,7 @@ class EditProfileView extends GetView<EditProfileController> {
             ),
             if (controller.isLoading.value) const LoadingScreen()
           ],
-        ),
+        ),),
       ),
     );
   }
@@ -67,37 +67,46 @@ class EditProfileView extends GetView<EditProfileController> {
       child: Column(
         children: [
           controller.base64Image.value.isEmpty
-              ? CustomCircleAvatar(
-            width: 100,
-            height: 100,
-            image: controller.customer.value
-                .profileImageUrl ??
-                "",
-            bgColor: AppColors.primaryColor
-                .withOpacity(.5),
-            fit: BoxFit.cover,
-          )
+              ? Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      // color: AppColors.borderColor,
+                      color: Colors.black38,
+                      border:
+                          Border.all(color: AppColors.borderColor, width: 2)),
+                  child: CustomCircleAvatar(
+                    width: 100,
+                    height: 100,
+                    image: controller.customer.value.url ?? "",
+                    bgColor: AppColors.primaryColor.withAlpha((.5*255).toInt()),
+                    fit: BoxFit.cover,
+                  ),
+                )
               : Container(
-            padding: const EdgeInsets.all(1),
-            decoration: const BoxDecoration(
-              color: AppColors.primaryColor,
-              shape: BoxShape.circle,
-            ),
-            child: Container(
-              width: 80,
-              height: 80,
-              clipBehavior: Clip.hardEdge,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-              ),
-              child: Image.memory(
-                base64Decode(
-                    controller.base64Image.value),
-                fit: BoxFit.cover,
-              ),
-            ),
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      // color: AppColors.borderColor,
+                      color: Colors.black38,
+                      border:
+                          Border.all(color: AppColors.borderColor, width: 2)),
+                  child: Container(
+                    width: 80.r,
+                    height: 80.r,
+                    clipBehavior: Clip.hardEdge,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: Image.memory(
+                      base64Decode(controller.base64Image.value),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+          SizedBox(
+            height: AppDimensions.contentPadding.h,
           ),
-          SizedBox(height: AppDimensions.contentPadding.h,),
           InkWell(
             onTap: () {
               Get.bottomSheet(choseImage());
@@ -107,9 +116,14 @@ class EditProfileView extends GetView<EditProfileController> {
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: AppDimensions.widgetPadding.h,),
-          HeaderText(text: "Customer ID: ${controller.customer.value.userId??""}"),
-          SizedBox(height: AppDimensions.sectionPadding.h,),
+          SizedBox(
+            height: AppDimensions.widgetPadding.h,
+          ),
+          HeaderText(
+              text: "Customer ID: ${controller.customer.value.userId ?? ""}"),
+          SizedBox(
+            height: AppDimensions.sectionPadding.h,
+          ),
           CustomTextField(
             hintText: "First Name",
             levelText: "First Name",
@@ -117,7 +131,9 @@ class EditProfileView extends GetView<EditProfileController> {
             validatorText: "Required",
             controller: controller.firstNameController,
           ),
-          SizedBox(height: AppDimensions.widgetPadding.h,),
+          SizedBox(
+            height: AppDimensions.widgetPadding.h,
+          ),
           CustomTextField(
             hintText: "Last Name",
             levelText: "Last Name",
@@ -125,8 +141,9 @@ class EditProfileView extends GetView<EditProfileController> {
             validatorText: "Required",
             controller: controller.lastNameController,
           ),
-          SizedBox(height: AppDimensions.widgetPadding.h,),
-
+          SizedBox(
+            height: AppDimensions.widgetPadding.h,
+          ),
           CustomPhoneTextField(
             controller: controller.phoneController,
           ),
@@ -137,7 +154,9 @@ class EditProfileView extends GetView<EditProfileController> {
             validatorText: "Required",
             controller: controller.phoneController,
           ),*/
-          SizedBox(height: AppDimensions.widgetPadding.h,),
+          SizedBox(
+            height: AppDimensions.widgetPadding.h,
+          ),
           CustomTextField(
             hintText: "Email",
             levelText: "Email",
@@ -145,13 +164,14 @@ class EditProfileView extends GetView<EditProfileController> {
             validatorText: "Required",
             controller: controller.emailController,
           ),
-          SizedBox(height: AppDimensions.widgetPadding.h,),
+          SizedBox(
+            height: AppDimensions.widgetPadding.h,
+          ),
           CustomDropDownField(
               hintText: "Gender",
               lavelText: "Gender",
               isRequired: true,
-              value:
-              controller.selectedGender.toUpperCase(),
+              value: controller.selectedGender.toUpperCase(),
               itemList: controller.genders,
               onChange: (value) {
                 controller.selectedGender = value ?? "";
@@ -175,18 +195,23 @@ class EditProfileView extends GetView<EditProfileController> {
           SizedBox(
             height: AppDimensions.sectionPadding.h,
           ),
-          AppButton(text: "Update", onTap: (){
-
-            if(_formKey.currentState?.validate()??false){
-              controller.updateUser();
-            }
-          },bgColor: AppColors.primaryColor,),
-          SizedBox(height: AppDimensions.sectionPadding.h,),
+          AppButton(
+            text: "Update",
+            onTap: () {
+              if (_formKey.currentState?.validate() ?? false) {
+                controller.updateUser();
+              }
+            },
+            bgColor: AppColors.primaryColor,
+          ),
+          SizedBox(
+            height: AppDimensions.sectionPadding.h,
+          ),
         ],
       ),
     );
-
   }
+
   Widget choseImage({CropStyle? cropStyle}) {
     return Container(
       // padding: EdgeInsets.symmetric(horizontal: Dimensions.horizontalPadding),
@@ -209,13 +234,13 @@ class EditProfileView extends GetView<EditProfileController> {
             size: 18,
           ),
           SizedBox(height: 32.h //AppDimensions.widgetPaddingVer,
-          ),
+              ),
           const Divider(
             thickness: 5,
             color: AppColors.primaryColor,
           ),
           SizedBox(height: 32.h // AppDimensions.contentPaddingVer,
-          ),
+              ),
           Container(
             margin: const EdgeInsets.all(5),
             color: Colors.white,
@@ -229,7 +254,7 @@ class EditProfileView extends GetView<EditProfileController> {
                   padding: EdgeInsets.symmetric(
                       horizontal: 24.w, // AppDimensions.horizontalPadding,
                       vertical: 24.h // AppDimensions.widgetPaddingVer
-                  ),
+                      ),
                   child: Row(
                     children: [
                       Image.asset(
@@ -237,7 +262,7 @@ class EditProfileView extends GetView<EditProfileController> {
                         height: 40.h,
                       ),
                       SizedBox(width: 24.w // AppDimensions.widgetPaddingHor,
-                      ),
+                          ),
                       const HeaderText(text: "Open Camera"),
                     ],
                   ),
@@ -260,7 +285,7 @@ class EditProfileView extends GetView<EditProfileController> {
                   padding: EdgeInsets.symmetric(
                       horizontal: 24.w, // AppDimensions.horizontalPadding,
                       vertical: 24.w //AppDimensions.widgetPaddingVer
-                  ),
+                      ),
                   child: Row(
                     children: [
                       Image.asset(
@@ -268,7 +293,7 @@ class EditProfileView extends GetView<EditProfileController> {
                         height: 40.h,
                       ),
                       SizedBox(width: 16.w // AppDimensions.widgetPaddingHor,
-                      ),
+                          ),
                       const HeaderText(text: "Open Gallery"),
                     ],
                   ),
@@ -277,7 +302,7 @@ class EditProfileView extends GetView<EditProfileController> {
             ),
           ),
           SizedBox(height: 32.h //AppDimensions.sectionPaddingVer,
-          )
+              )
         ],
       ),
     );

@@ -1,3 +1,5 @@
+import 'package:cgp/common_widgets/custom_app_bar.dart';
+import 'package:cgp/common_widgets/my_drawer.dart';
 import 'package:cgp/constraints/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,76 +13,82 @@ import '../../../../constraints/app_colors.dart';
 import '../controllers/location_search_controller.dart';
 
 class LocationSearchView extends GetView<LocationSearchController> {
-  const LocationSearchView({super.key});
+   LocationSearchView({super.key});
+  final GlobalKey<ScaffoldState>scaffoldKey=GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar:  Container(
-        padding: EdgeInsets.symmetric(horizontal: AppDimensions.horizontalPadding.w,vertical: AppDimensions.contentPadding.h),
-        height: 70.h,
-        child: AppButton(
-          text: "select",
-          bgColor: AppColors.primaryColor,
-          onTap: () {
-            controller.selectLocation();
-          },
-        ),
-      ),
-        body: Obx(
-          () => SafeArea(
-            child: controller.isLoading.value
-                ? const Center(child: CircularProgressIndicator())
-                : Stack(
-                    children: [
-                      GoogleMap(
-                        // padding: EdgeInsets.only(top: Get.height - 200.h),
-                        onMapCreated: (mapController) {
-                          if (!controller.mapController.isCompleted) {
-                            controller.mapController.complete(mapController);
-                          } else {
-                            controller.mapController.future;
-                          }
-                        },
-                        myLocationEnabled: true,
-                        //myLocationButtonEnabled: false,
-                        mapType: MapType.normal,
-                        initialCameraPosition: controller.cameraPosition,
-                        onCameraMove: (CameraPosition position) {
-                          if (position.target.longitude !=
-                                  controller.latitude.value ||
-                              position.target.longitude !=
-                                  controller.longitude.value) {
-                            controller.latitude.value =
-                                position.target.latitude;
-                            controller.longitude.value =
-                                position.target.longitude;
-                          }
-                        },
-                        onCameraIdle: () {
-                          controller.selectAddressFromMap(
-                            LatLng(controller.latitude.value,
-                                controller.longitude.value),
-                          );
-                        },
-                      ),
-                      Positioned(
-                        left: AppDimensions.sectionPadding.w,
-                        right: AppDimensions.widgetPadding * 4.w,
-                        top: 10,
-                        child: placesAutoCompleteTextField(),
-                      ),
-                      const Center(
-                        child: Icon(
-                          Icons.add_location,
-                          size: 45,
-                        ),
-                      ),
-                      // Container(height: Get.height,width: Get.width,color: Colors.black12,)
-                    ],
-                  ),
+    return SafeArea(
+      child: Scaffold(
+        key: scaffoldKey,
+        appBar: CustomAppBar(minimal: false,scaffoldKey:scaffoldKey ,enableBackButton: true,),
+        drawer: MyDrawer(),
+        bottomNavigationBar:  Container(
+          padding: EdgeInsets.symmetric(horizontal: AppDimensions.horizontalPadding.w,vertical: AppDimensions.contentPadding.h),
+          height: 70.h,
+          child: AppButton(
+            text: "select",
+            bgColor: AppColors.primaryColor,
+            onTap: () {
+              controller.selectLocation();
+            },
           ),
         ),
+          body: Obx(
+            () => SafeArea(
+              child: controller.isLoading.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : Stack(
+                      children: [
+                        GoogleMap(
+                          // padding: EdgeInsets.only(top: Get.height - 200.h),
+                          onMapCreated: (mapController) {
+                            if (!controller.mapController.isCompleted) {
+                              controller.mapController.complete(mapController);
+                            } else {
+                              controller.mapController.future;
+                            }
+                          },
+                          myLocationEnabled: true,
+                          //myLocationButtonEnabled: false,
+                          mapType: MapType.normal,
+                          initialCameraPosition: controller.cameraPosition,
+                          onCameraMove: (CameraPosition position) {
+                            if (position.target.longitude !=
+                                    controller.latitude.value ||
+                                position.target.longitude !=
+                                    controller.longitude.value) {
+                              controller.latitude.value =
+                                  position.target.latitude;
+                              controller.longitude.value =
+                                  position.target.longitude;
+                            }
+                          },
+                          onCameraIdle: () {
+                            controller.selectAddressFromMap(
+                              LatLng(controller.latitude.value,
+                                  controller.longitude.value),
+                            );
+                          },
+                        ),
+                        Positioned(
+                          left: AppDimensions.sectionPadding.w,
+                          right: AppDimensions.widgetPadding * 4.w,
+                          top: 10,
+                          child: placesAutoCompleteTextField(),
+                        ),
+                        const Center(
+                          child: Icon(
+                            Icons.add_location,
+                            size: 45,
+                          ),
+                        ),
+                        // Container(height: Get.height,width: Get.width,color: Colors.black12,)
+                      ],
+                    ),
+            ),
+          ),
+      ),
     );
   }
 

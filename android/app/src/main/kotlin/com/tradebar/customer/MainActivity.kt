@@ -1,4 +1,4 @@
-package com.revinr.cgp_new
+package com.tradebar.customer
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterFragmentActivity

@@ -154,7 +154,7 @@ class CheckOutController extends GetxController {
       isLoading.value = false;
       await getMyCartFromRemoteServer();
 
-      Get.offAllNamed(Routes.HOME);
+      Get.offAllNamed(Routes.TRANSPORTATION);
     } else {
       CustomSnackBar(msg: AppStrings.httpErrorMSG.value, isSuccess: false)
           .showSnackBar();

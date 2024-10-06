@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cgp/app/modules/generalMap/general_map_controller.dart';
 import 'package:cgp/app/modules/orderDetails/models/cancel_reasons_model.dart';
 import 'package:cgp/app/modules/orderDetails/models/order_details_model.dart';
+import 'package:cgp/app/modules/orderHistory/controllers/order_history_controller.dart';
 import 'package:cgp/common_widgets/custom_snackbar.dart';
 import 'package:cgp/constraints/app_strings.dart';
 import 'package:cgp/models/cancel_reason_model.dart';
@@ -92,8 +93,7 @@ class OrderDetailsController extends GetxController {
   }
 
   void createShowButton() {
-    print(orderDetails.value.data?.orderStatus);
-
+    showButton.value="";
     if (orderDetails.value.data?.orderStatus == OrderStatus.searching.name ||
         orderDetails.value.data?.orderStatus ==
             OrderStatus.reachedAtPickupPoint.name ||
@@ -122,8 +122,9 @@ class OrderDetailsController extends GetxController {
     try {
       var response=await RemoteServices.putRequest(endPoint: endPoint);
       if(response!=null){
-
         Get.find<FloatingController>().showFloating();
+        Get.find<FloatingController>().hideFloating();
+        Get.put(OrderHistoryController()).getOrderHistory();
         CustomSnackBar(
           isSuccess: true,
           msg: response["message"]

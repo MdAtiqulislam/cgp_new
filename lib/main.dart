@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:cgp/app/modules/customFloatingCartButton/custom_floating_cart_button_controller.dart';
 import 'package:cgp/constraints/app_strings.dart';
 import 'package:cgp/services/notification_services.dart';
 import 'package:cgp/theme/theme.dart';
@@ -10,7 +13,6 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 
 import 'package:get/get.dart';
 
-import 'app/modules/messaging/controllers/messaging_controller.dart';
 import 'app/routes/app_pages.dart';
 import 'common_widgets/floating_widget.dart';
 
@@ -27,11 +29,15 @@ Future<void> main() async {
   //Get.put(MessagingController());
 
   await Firebase.initializeApp(
-    //  name: "CGP App",
-    // name: "The Mall Bd",
-      options:const FirebaseOptions(
+      options:(Platform.isIOS || Platform.isMacOS)
+          ? const FirebaseOptions(
+          apiKey: "AIzaSyCaWliT3t2vJtznHbruqfXSVAIuMwVmQsk",
+          appId: "1:1030561817194:ios:3aa68eafa1e4ea853fe013",
+          messagingSenderId: "1030561817194",
+          projectId: "cgp-app-420416")
+          :const FirebaseOptions(
         apiKey: 'AIzaSyBbhFT8Iq5hraD98_ZKQrLVO8K3j4s1Zdg',
-        appId: '1:1030561817194:android:69faca2339f9fa003fe013',
+        appId: '1:1030561817194:android:959c718cf6ae25633fe013',
         messagingSenderId: '1030561817194',
         projectId: "cgp-app-420416",
       )
@@ -49,6 +55,7 @@ Future<void> main() async {
 
   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundMessagingHandler);
 
+  Get.put(CustomFloatingCartButtonController());
   runApp(
       const MyApp()
   );

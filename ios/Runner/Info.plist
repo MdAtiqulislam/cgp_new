@@ -2,10 +2,44 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+            <string>Allow access photo gallery to choose photo for changing profile picture</string>
+            <key>NSCameraUsageDescription</key>
+            <string>Allow access camera to take photo for changing profile picture</string>
+
+            <key>NSLocationWhenInUseUsageDescription</key>
+            <string>$(PRODUCT_NAME) requires access to your location to provide accurate delivery updates and ensure efficient navigation during active use of the app.</string>
+
+            <key>NSLocationAlwaysUsageDescription</key>
+            <string>$(PRODUCT_NAME) requires location access to track deliveries and provide real-time updates, even when the app is in the background.</string>
+            <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+            <string>$(PRODUCT_NAME) requires location access to track deliveries and provide real-time updates, even when the app is in the background.</string>
+
+
+            <key>NSContactsUsageDescription</key>
+            <string>TradeBar-Customer needs access to your contacts to allow you to share delivery details with others.</string>
+
+            <key>NSMicrophoneUsageDescription</key>
+            <string>TradeBar-Customer requires microphone access for voice commands and hands-free navigation during deliveries.</string>
+
+            <key>LSApplicationQueriesSchemes</key>
+            <array>
+              <string>sms</string>
+              <string>tel</string>
+            </array>
+
+         <key>UIBackgroundModes</key>
+                 <array>
+                     <string>remote-notification</string>
+                     <!-- Uncomment the next line if needed -->
+                     <!-- <string>processing</string> -->
+                 </array>
+
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Cgp New</string>
+		<string>TradeBar Customer</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>

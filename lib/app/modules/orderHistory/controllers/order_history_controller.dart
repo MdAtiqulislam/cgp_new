@@ -12,7 +12,7 @@ class OrderHistoryController extends GetxController {
   @override
   void onInit() async{
     super.onInit();
-    await getOrderHistory();
+   // await getOrderHistory();
   }
 
   @override

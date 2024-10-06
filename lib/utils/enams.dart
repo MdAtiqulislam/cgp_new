@@ -69,3 +69,20 @@ extension OrderStatusExtension on OrderStatus {
     }
   }
 }
+
+
+enum BranchType {
+  headOffice,
+  branchOffice,
+}
+
+extension BranchTypeExtension on BranchType {
+  String get name {
+    switch (this) {
+      case BranchType.branchOffice:
+        return 'branch office';
+      case BranchType.headOffice:
+        return 'head office';
+    }
+  }
+}

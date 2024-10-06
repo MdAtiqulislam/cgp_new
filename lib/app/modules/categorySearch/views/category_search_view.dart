@@ -1,8 +1,10 @@
-import 'package:cgp/app/modules/searchPage/controllers/search_page_controller.dart';
 import 'package:cgp/common_widgets/custom_app_bar.dart';
 import 'package:cgp/common_widgets/custom_title.dart';
+import 'package:cgp/constraints/app_colors.dart';
+import 'package:cgp/constraints/app_strings.dart';
 import 'package:cgp/constraints/body_text.dart';
 import 'package:cgp/constraints/header_text.dart';
+import 'package:cgp/utils/enams.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -11,10 +13,12 @@ import '../../../../common_widgets/custom_search_bar.dart';
 import '../../../../common_widgets/my_drawer.dart';
 import '../../../../constraints/dimensions.dart';
 import '../../../routes/app_pages.dart';
+import '../../shopDetails/controllers/shop_details_controller.dart';
 import '../controllers/category_search_controller.dart';
 
 class CategorySearchView extends GetView<CategorySearchController> {
-   CategorySearchView({super.key});
+  CategorySearchView({super.key});
+
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -23,7 +27,7 @@ class CategorySearchView extends GetView<CategorySearchController> {
       child: Obx(
         () => Scaffold(
           key: scaffoldKey,
-          appBar:  CustomAppBar(
+          appBar: CustomAppBar(
             minimal: false,
             scaffoldKey: scaffoldKey,
           ),
@@ -42,7 +46,7 @@ class CategorySearchView extends GetView<CategorySearchController> {
                   child: CustomSearchBar(
                     enabled: false,
                     onTap: () {
-                      Get.toNamed(Routes.SEARCH_PAGE);
+                      Get.toNamed(Routes.WAREHOUSE_SEARCH);
                     },
                   ),
                 ),
@@ -55,7 +59,7 @@ class CategorySearchView extends GetView<CategorySearchController> {
                   child: CategoryDropdown(
                     dropdownSearchFieldController:
                         controller.dropDownController,
-                    data: controller.categoryList.value.data??[],
+                    data: controller.categoryList.value.data ?? [],
                     hintText: "Choose Items Category",
                   ),
                 ),
@@ -70,18 +74,22 @@ class CategorySearchView extends GetView<CategorySearchController> {
                   ),
                 ),
                 if (controller.isLoading.value)
-                  SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator(),),
+                  const SliverFillRemaining(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   ),
                 if (!controller.isLoading.value)
                   SliverGrid(
-                    delegate: SliverChildBuilderDelegate(childCount: controller.wareHouseByCategoryModel.value.data?.warehouses?.length??0,
-                        (buildContext, index) {
-                      return gridItem(index:index);
+                    delegate: SliverChildBuilderDelegate(
+                        childCount: controller.wareHouseByCategoryModel.value
+                                .data?.warehouses?.length ??
+                            0, (buildContext, index) {
+                      return gridItem(index: index);
                     }),
                     gridDelegate:
                         const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 150,
+                            maxCrossAxisExtent: 180,
                             crossAxisSpacing: 5,
                             mainAxisSpacing: 5),
                   ),
@@ -94,31 +102,37 @@ class CategorySearchView extends GetView<CategorySearchController> {
   }
 
   Widget gridItem({required int index}) {
-
     return Container(
       clipBehavior: Clip.hardEdge,
+      margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(
-            AppDimensions.borderRadius.r),
-      ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppDimensions.borderRadius.r),
+          boxShadow: const [
+            BoxShadow(color: Colors.black26, blurRadius: 1),
+            BoxShadow(
+                color: Colors.black38, blurRadius: 5, offset: Offset(0, 3))
+          ]),
       child: Stack(
         fit: StackFit.expand,
         children: [
           Image.asset(
-            "assets/images/moc_image_${index % 10}.png",
+            AppImagePath.warehouse,
             fit: BoxFit.cover,
           ),
           Container(
             decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      Colors.black54,
-                      Colors.transparent
-                    ])),
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black.withAlpha((.8 * 255).toInt()),
+                  Colors.transparent,
+                ],
+              ),
+            ),
           ),
-           Positioned(
+          Positioned(
             bottom: 10,
             left: 10,
             right: 10,
@@ -126,8 +140,10 @@ class CategorySearchView extends GetView<CategorySearchController> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 HeaderText(
-                  text: controller.wareHouseByCategoryModel.value.data?.warehouses?[index].name??"",
+                HeaderText(
+                  text: controller.wareHouseByCategoryModel.value.data
+                          ?.warehouses?[index].name ??
+                      "",
                   align: TextAlign.start,
                   color: Colors.white,
                   maxLine: 4,
@@ -137,7 +153,8 @@ class CategorySearchView extends GetView<CategorySearchController> {
                 ),
                 // SizedBox(height: AppDimensions.contentPadding,),
                 BodyText(
-                  text: "${controller.wareHouseByCategoryModel.value.data?.warehouses?[index].productCounts} items",
+                  text:
+                      "${controller.wareHouseByCategoryModel.value.data?.warehouses?[index].productCounts} items",
                   color: Colors.white,
                   align: TextAlign.start,
                   resize: false,
@@ -147,18 +164,26 @@ class CategorySearchView extends GetView<CategorySearchController> {
             ),
           ),
           Positioned(
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: (){
-                    Get.toNamed(Routes.SEARCH_PAGE);
-                  },
-                ),
-              )),
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Get.put(ShopDetailsController());
+                  Get.find<ShopDetailsController>().wareHouseId.value=controller.wareHouseByCategoryModel.value.data?.warehouses?[index].id ?? "";
+                  Get.find<ShopDetailsController>().branchId.value=controller.wareHouseByCategoryModel.value.data?.warehouses?[index].id ?? "";
+                  Get.find<ShopDetailsController>().branchType.value = BranchType.headOffice.name;//warehouse.branchInfo?.branchType??"";
+                  Get.find<ShopDetailsController>().getWarehouseDetails();
+                  Get.find<ShopDetailsController>().getBranchDetails();
+                  Get.find<ShopDetailsController>().getProducts();
+                  Get.toNamed(Routes.SHOP_DETAILS);
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );

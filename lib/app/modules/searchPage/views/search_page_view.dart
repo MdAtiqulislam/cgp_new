@@ -1,6 +1,8 @@
 
+import 'package:cgp/app/modules/customFloatingCartButton/custom_floating_cart_button.dart';
 import 'package:cgp/app/modules/searchPage/views/single_search_item.dart';
 import 'package:cgp/common_widgets/custom_app_bar.dart';
+import 'package:cgp/common_widgets/custom_loading_screen.dart';
 import 'package:cgp/common_widgets/custom_radio_button.dart';
 import 'package:cgp/common_widgets/custom_search_bar.dart';
 import 'package:cgp/constraints/app_colors.dart';
@@ -29,79 +31,95 @@ class SearchPageView extends GetView<SearchPageController> {
             minimal: false,
             scaffoldKey: scaffoldKey,
           ),
+          floatingActionButton: const CustomFloatingCartButton(),
+          floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
           drawer: MyDrawer(),
-          body: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: AppDimensions.horizontalPadding.w),
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: AppDimensions.widgetPadding.h,
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: CustomSearchBar(
-                    searchController: controller.searchController,
-                    onChange: (value){
-                      if ((value?.length??0) >= 3) {
-                        controller.searchKey.value=value??"";
-                        controller.fetchData();
-                      }
-                    },
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: AppDimensions.widgetPadding.h,
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      BodyText(
-                        text:
-                            "${controller.searchKey.value} (${controller.searchProducts.length} Results)",
-                        color: AppColors.primaryColor,
-                        fontWeight: FontWeight.w500,
+          body: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.horizontalPadding.w),
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: AppDimensions.widgetPadding.h,
                       ),
-                      filterButton(),
-                    ],
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: AppDimensions.widgetPadding.h,
-                  ),
-                ),
-                if (controller.isLoading.value)
-                  const SliverFillRemaining(
-                    child: Center(
-                      child: CircularProgressIndicator(),
                     ),
-                  ),
-                if (!controller.isLoading.value)
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                        childCount: controller.searchProducts.length,
-                        (buildContext, index) {
-                      return SingleSearchItem(
-                        product: controller.searchProducts[index],
-                        index: index,
-                        isCart: index % 2 == 0 ? true : false,
-                        isFavourite: index % 2 != 0 ? true : false,
-                      );
-                    }),
-                    /*gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 800,
-                    childAspectRatio: 0,
-                    mainAxisSpacing: 10.h,
-                    crossAxisSpacing: 10.w
-                  ),*/
-                  ),
-              ],
-            ),
+                    SliverToBoxAdapter(
+                      child: CustomSearchBar(
+                        searchController: controller.searchController,
+                        onChange: (value){
+                          if ((value?.length??0) >= 3) {
+                            controller.searchKey.value=value??"";
+                            controller.fetchData();
+                          }
+                        },
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: AppDimensions.widgetPadding.h,
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          BodyText(
+                            text:
+                                "${controller.searchKey.value} (${controller.searchProducts.length} Results)",
+                            color: AppColors.primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          filterButton(),
+                        ],
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: AppDimensions.widgetPadding.h,
+                      ),
+                    ),
+                    /*if (controller.isLoading.value)
+                      const SliverFillRemaining(
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),*/
+                  //  if (!controller.isLoading.value)
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                            childCount: controller.searchProducts.length,
+                            (buildContext, index) {
+                          return SingleSearchItem(
+                            product: controller.searchProducts[index],
+                            index: index,
+                            isCart: index % 2 == 0 ? true : false,
+                            isFavourite: index % 2 != 0 ? true : false,
+                            onTapCart: (){
+
+                              controller.handelMyCart(id: controller.searchProducts[index].id??"");
+
+                            },
+                            onTapFavourite: () {
+                              controller.handelWishList(id: controller.searchProducts[index].id??"");
+
+               },
+                          );
+                        }),
+                        /*gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 800,
+                        childAspectRatio: 0,
+                        mainAxisSpacing: 10.h,
+                        crossAxisSpacing: 10.w
+                      ),*/
+                      ),
+                  ],
+                ),
+              ),
+              if(controller.isLoading.value)const LoadingScreen()
+            ],
           ),
         ),
       ),

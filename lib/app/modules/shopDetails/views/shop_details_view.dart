@@ -1,6 +1,8 @@
 import 'package:cgp/app/modules/shopDetails/views/shop_details_section.dart';
 import 'package:cgp/common_widgets/custom_app_bar.dart';
+import 'package:cgp/common_widgets/custom_circle_avatar.dart';
 import 'package:cgp/common_widgets/custom_image_slider.dart';
+import 'package:cgp/common_widgets/custom_network_image.dart';
 import 'package:cgp/common_widgets/custom_text_field.dart';
 import 'package:cgp/common_widgets/custom_title.dart';
 import 'package:cgp/constraints/app_colors.dart';
@@ -52,9 +54,56 @@ class ShopDetailsView extends GetView<ShopDetailsController> {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: CustomImageSlider(
+                  child:Stack(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.all(2),
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(AppDimensions.borderRadius.r),
+                          color: Colors.white,
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black38,
+                              blurRadius: 3
+                            )
+                          ]
+                        ),
+                        child: CustomNetworkImage(
+                            width: Get.width,
+                            height: 250.sp,
+                            image: controller.wareHouseDetails.value.data?.thumbnailUrl??"",
+                          localImage: AppImagePath.warehouse,
+                        //  fit: BoxFit.cover,
+                        ),
+                      ),
+                      if(controller.wareHouseDetails.value.data?.logoUrl!=null)  Positioned(
+                        top: AppDimensions.contentPadding,
+                        left: AppDimensions.contentPadding,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              // color: AppColors.borderColor,
+                              color: Colors.black38,
+                              border: Border.all(color: AppColors.borderColor,width: 2)
+                          ),
+                          child: CustomCircleAvatar(
+                            width: 50.r,
+                            height: 50.r,
+                            image: controller.wareHouseDetails.value.data?.logoUrl??"",
+                            fit: BoxFit.cover,
+                            bgColor: Colors.transparent,
+                            localImage: AppImagePath.noImage,
+                          ),
+                        ),
+                      ),
+
+                      ],
+                  )
+                  /*CustomImageSlider(
                       items: ["assets/images/slider_image_5.png"],
-                      height: 200.h),
+                      height: 200.h),*/
                 ),
                 SliverToBoxAdapter(
                   child: SizedBox(
@@ -103,16 +152,16 @@ class ShopDetailsView extends GetView<ShopDetailsController> {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate(
           childCount:
-              controller.productsByWareHouse.value.data?.products?.length ?? 0,
+              controller.products.value.data?.products?.length ?? 0,
           (buildContext, index) {
         return SingleGridItem(
-            index: index,
+           // index: index,
             product:
-                controller.productsByWareHouse.value.data?.products?[index],
+                controller.products.value.data?.products?[index],
             onTap: () {
               Get.put(ProductDetailsController());
               Get.find<ProductDetailsController>().getDetails(
-                  id: controller.productsByWareHouse.value.data
+                  id: controller.products.value.data
                           ?.products?[index].id ??
                       "");
               Get.toNamed(Routes.PRODUCT_DETAILS);
@@ -132,7 +181,7 @@ class ShopDetailsView extends GetView<ShopDetailsController> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(.5),
+              color: Colors.black.withAlpha((.5*255).toInt()),
               blurRadius: 10,
               offset: const Offset(5, 5)
               //spreadRadius: 10

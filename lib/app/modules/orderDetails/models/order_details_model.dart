@@ -603,8 +603,8 @@ class OrderDetailsWarehouseBranch {
 
 class DeliveryInfo {
   final String? shippingStatus;
-  final int? initDistance;
-  final int? initDuration;
+  final String? initDistance;
+  final String? initDuration;
   final dynamic finalDistance;
   final dynamic finalDuration;
   final dynamic estimatedRemainingDistance;

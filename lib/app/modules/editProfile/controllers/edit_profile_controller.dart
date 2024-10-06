@@ -59,8 +59,8 @@ Future<void>  getUserData() async{
         phoneController.text=customer.value.phone??"";
         emailController.text=customer.value.email??"";
         selectedGender =
-        (customer.value.gender ?? "").isEmpty ? "MALE" : customer.value.gender;
-        dateOfBirthController.text = customer.value.dateOfBirth ?? "";
+        ((customer.value.gender ?? "").isEmpty ? "MALE" : customer.value.gender)!;
+        dateOfBirthController.text = customer.value.dateOfBirth.toString();
 
       }
     });

@@ -1,3 +1,4 @@
+import 'package:cgp/app/modules/customFloatingCartButton/custom_floating_cart_button.dart';
 import 'package:cgp/common_widgets/common_description.dart';
 import 'package:cgp/common_widgets/custom_app_bar.dart';
 import 'package:cgp/common_widgets/custom_image_slider.dart';
@@ -30,6 +31,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
           scaffoldKey: scaffoldKey,
         ),
         drawer: MyDrawer(),
+        floatingActionButton: const CustomFloatingCartButton(),
         body: Obx(
           () => Stack(
             children: [
@@ -43,44 +45,11 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                         height: AppDimensions.widgetPadding.h,
                       ),
                     ),
-                    /*SliverToBoxAdapter(
-                      child: CustomSearchBar(
-                        enabled: false,
-                        onTap: () {
-                          Get.put(SearchPageController());
-                          Get.find<SearchPageController>().searchController.text =
-                              "Trusses";
-                          Get.toNamed(Routes.SEARCH_PAGE);
-                        },
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: AppDimensions.sectionPadding.h,
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: CategoryDropdown(
-                        dropdownSearchFieldController:
-                            controller.dropDownController,
-                        data: controller.categoryList,
-                        hintText: "Choose Items Category",
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: AppDimensions.sectionPadding.h,
-                      ),
-                    ),*/
+
                     SliverToBoxAdapter(
                       child: CustomImageSlider(
                         height: 300,
-                        items: [
-                          "assets/images/moc_image_9.png",
-                          "assets/images/moc_image_8.png",
-                          "assets/images/moc_image_7.png",
-                          "assets/images/moc_image_6.png",
-                        ],
+                        items: controller.details.value.data?.imgUrls??[],
                         autoPlay: false,
                       ),
                     ),
@@ -137,7 +106,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                           SizedBox(
                             height: AppDimensions.widgetPadding.h,
                           ),
-                          Row(
+                         /* Row(
                             children: [
                               IconButton(
                                 onPressed: () {
@@ -148,9 +117,6 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                                 icon: controller.isFavourite.value
                                     ? Icon(Icons.favorite_outlined)
                                     : Icon(Icons.favorite_border),
-                              ),
-                              SizedBox(
-                                width: AppDimensions.sectionPadding.w,
                               ),
                               Row(
                                 children: [
@@ -165,7 +131,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                                           color: controller.quantity.value > 1
                                               ? AppColors.secondaryColor
                                               : AppColors.inactiveColor,
-                                        )),
+                                        ),),
                                   ),
                                   Container(
                                     padding: EdgeInsets.symmetric(
@@ -186,19 +152,96 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                                       )),
                                 ],
                               ),
-                              SizedBox(
-                                width: AppDimensions.sectionPadding.w,
-                              ),
-                              IconButton(
+
+                              MaterialButton(
                                 onPressed: () {
                                   controller.handelMyCart();
                                 },
-                                icon: !controller.isCartItem.value
-                                    ? const Icon(Icons.shopping_cart_outlined)
-                                    : const Icon(Icons.shopping_cart),
+                                  color:AppColors.primaryColor ,
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.shopping_cart,color: Colors.white,),
+                                    HeaderText(text: "Add to cart",color:Colors.white,)
+                                  ],
+                                )
                               ),
                             ],
-                          ),
+                          ),*/
+
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  controller.handelWishList(id: controller.details.value.data?.id ?? "");
+                                },
+                                icon: controller.isFavourite.value
+                                    ? Icon(Icons.favorite_outlined)
+                                    : Icon(Icons.favorite_border),
+                              ),
+                              Flexible(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IgnorePointer(
+                                      ignoring: controller.quantity.value <= 1,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          controller.decrement();
+                                        },
+                                        icon: Icon(
+                                          Icons.remove_circle,
+                                          color: controller.quantity.value > 1
+                                              ? AppColors.secondaryColor
+                                              : AppColors.inactiveColor,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: AppDimensions.horizontalPadding.w),
+                                      child: HeaderText(
+                                        text: controller.quantity.value.toString(),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        controller.increment();
+                                      },
+                                      icon: Icon(
+                                        Icons.add_circle,
+                                        color: AppColors.secondaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Flexible(
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    bool shouldShowIcon = constraints.maxWidth > 120; // Adjust the width threshold based on your needs
+
+                                    return MaterialButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+                                        controller.handelMyCart();
+                                      },
+                                      color: AppColors.primaryColor,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          if (shouldShowIcon)
+                                             Icon(Icons.shopping_cart, color: Colors.white,size: 18.sp,),
+                                          if (shouldShowIcon) SizedBox(width: 8.w), // Add some spacing between the icon and text
+                                          Flexible(child: const HeaderText(text: "Add to cart", color: Colors.white)),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          )
+
+
                         ],
                       ),
                     ),
@@ -392,7 +435,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
           childCount: controller.similarProductsModel.value.data?.length ?? 0,
           (buildContext, index) {
         return SingleGridItem(
-            index: index,
+           // index: index,
             product: controller.similarProductsModel.value.data?[index],
             onTap: () {
               Get.put(ProductDetailsController());

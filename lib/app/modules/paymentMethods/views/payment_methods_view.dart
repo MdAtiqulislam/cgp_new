@@ -31,7 +31,7 @@ class PaymentMethodsView extends GetView<PaymentMethodsController> {
         drawer: MyDrawer(),
         bottomNavigationBar: bottomNavbar(),
         body: Obx(
-              () => SingleChildScrollView(
+          () => SingleChildScrollView(
             child: Stack(
               children: [
                 Padding(
@@ -39,69 +39,90 @@ class PaymentMethodsView extends GetView<PaymentMethodsController> {
                       horizontal: AppDimensions.horizontalPadding.w,
                       vertical: AppDimensions.verticalPadding.h),
                   child: controller.paymentMethodListModel.value.data
-                      ?.paymentMethodList?.data
-                      ?.isEmpty ??
-                      true && !controller.isLoading.value
+                              ?.paymentMethodList?.data?.isEmpty ??
+                          true && !controller.isLoading.value
                       ? const EmptyScreen(
-                      title: "You haven't added any payment methods yet.")
+                          title: "You haven't added any payment methods yet.")
                       : ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: controller.paymentMethodListModel.value
-                        .data?.paymentMethodList?.data?.length ??
-                        0,
-                    itemBuilder: (buildContext, index) {
-                      return SinglePaymentMethodCard(
-                        cardBrand: controller.paymentMethodListModel.value
-                            .data?.paymentMethodList?.data?[index]
-                            .card?.brand ??
-                            "",
-                        last4Digits: controller.paymentMethodListModel
-                            .value
-                            .data
-                            ?.paymentMethodList
-                            ?.data?[index]
-                            .card
-                            ?.last4 ??
-                            "",
-                        expMonth: (controller.paymentMethodListModel.value
-                            .data
-                            ?.paymentMethodList
-                            ?.data?[index]
-                            .card
-                            ?.expMonth ??
-                            0)
-                            .toString(),
-                        expYear: (controller.paymentMethodListModel.value
-                            .data
-                            ?.paymentMethodList
-                            ?.data?[index]
-                            .card
-                            ?.expYear ??
-                            0)
-                            .toString(),
-                        isDefault: controller.paymentMethodListModel.value
-                            .data?.customer?.invoiceSettings
-                            ?.defaultPaymentMethod ==
-                            controller.paymentMethodListModel.value.data
-                                ?.paymentMethodList?.data?[index].id,
-                        onDelete: () {
-                          openConfirmDialog(
-                              pmId: controller.paymentMethodListModel.value
-                                  .data?.paymentMethodList
-                                  ?.data?[index].id ??
-                                  "");
-                        },
-                        makeDefault: () {
-                          controller.setDefault(
-                              pmId: controller.paymentMethodListModel
-                                  .value.data?.paymentMethodList
-                                  ?.data?[index].id ??
-                                  "");
-                        },
-                      );
-                    },
-                  ),
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: controller.paymentMethodListModel.value
+                                  .data?.paymentMethodList?.data?.length ??
+                              0,
+                          itemBuilder: (buildContext, index) {
+                            return SinglePaymentMethodCard(
+                              cardBrand: controller
+                                      .paymentMethodListModel
+                                      .value
+                                      .data
+                                      ?.paymentMethodList
+                                      ?.data?[index]
+                                      .card
+                                      ?.brand ??
+                                  "",
+                              last4Digits: controller
+                                      .paymentMethodListModel
+                                      .value
+                                      .data
+                                      ?.paymentMethodList
+                                      ?.data?[index]
+                                      .card
+                                      ?.last4 ??
+                                  "",
+                              expMonth: (controller
+                                          .paymentMethodListModel
+                                          .value
+                                          .data
+                                          ?.paymentMethodList
+                                          ?.data?[index]
+                                          .card
+                                          ?.expMonth ??
+                                      0)
+                                  .toString(),
+                              expYear: (controller
+                                          .paymentMethodListModel
+                                          .value
+                                          .data
+                                          ?.paymentMethodList
+                                          ?.data?[index]
+                                          .card
+                                          ?.expYear ??
+                                      0)
+                                  .toString(),
+                              isDefault: controller
+                                      .paymentMethodListModel
+                                      .value
+                                      .data
+                                      ?.customer
+                                      ?.invoiceSettings
+                                      ?.defaultPaymentMethod ==
+                                  controller.paymentMethodListModel.value.data
+                                      ?.paymentMethodList?.data?[index].id,
+                              onDelete: () {
+                                openConfirmDialog(
+                                    pmId: controller
+                                            .paymentMethodListModel
+                                            .value
+                                            .data
+                                            ?.paymentMethodList
+                                            ?.data?[index]
+                                            .id ??
+                                        "");
+                              },
+                              makeDefault: () {
+                                controller.setDefault(
+                                    pmId: controller
+                                            .paymentMethodListModel
+                                            .value
+                                            .data
+                                            ?.paymentMethodList
+                                            ?.data?[index]
+                                            .id ??
+                                        "");
+                              },
+                            );
+                          },
+                        ),
                 ),
                 if (controller.isLoading.value) const LoadingScreen()
               ],
@@ -120,6 +141,7 @@ class PaymentMethodsView extends GetView<PaymentMethodsController> {
           vertical: AppDimensions.contentPadding.h),
       child: AppButton(
         onTap: () async {
+          controller.isCardReady.value = false;
           Get.bottomSheet(
             isScrollControlled: true,
             ignoreSafeArea: false,
@@ -134,7 +156,7 @@ class PaymentMethodsView extends GetView<PaymentMethodsController> {
 
   Widget paymentMethodForm() {
     return Obx(
-          () => SafeArea(
+      () => SafeArea(
         child: Stack(
           children: [
             Container(
@@ -168,15 +190,14 @@ class PaymentMethodsView extends GetView<PaymentMethodsController> {
                   SizedBox(
                     height: AppDimensions.sectionPadding.h,
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: AppDimensions.horizontalPadding.w),
-                    child: CardField(
-                      onCardChanged: (card) {
-                        controller.cardDetails = card;
-                      },
-                    ),
-                  ),
+                  CardField(
+            onCardChanged: (card) {
+              if (card != null) {
+                controller.isCardReady.value = true;
+              }
+              controller.cardDetails = card;
+            },
+          ),
                   SizedBox(
                     height: AppDimensions.sectionPadding.h,
                   ),
@@ -197,7 +218,7 @@ class PaymentMethodsView extends GetView<PaymentMethodsController> {
                 ],
               ),
             ),
-            if (controller.isLoading.value)
+            if (controller.isLoading.value||!controller.isCardReady.value)
               const Positioned(
                 left: 0,
                 right: 0,
@@ -231,7 +252,8 @@ class PaymentMethodsView extends GetView<PaymentMethodsController> {
                   Image.asset(AppImagePath.warningIcon),
                   SizedBox(height: 16.h),
                   const HeaderText(
-                    text: "Are you sure you want to delete this payment method?",
+                    text:
+                        "Are you sure you want to delete this payment method?",
                     maxLine: 10,
                   ),
                   SizedBox(height: 32.h),

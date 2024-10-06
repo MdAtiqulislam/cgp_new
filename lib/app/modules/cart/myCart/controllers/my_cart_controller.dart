@@ -1,4 +1,6 @@
 import 'package:cgp/app/modules/cart/models/my_cart_model.dart';
+import 'package:cgp/app/modules/customFloatingCartButton/custom_floating_cart_button_controller.dart';
+import 'package:cgp/app/modules/home/controllers/home_controller.dart';
 import 'package:cgp/common_widgets/custom_snackbar.dart';
 import 'package:cgp/services/api_endpoints.dart';
 import 'package:cgp/services/remote_services.dart';
@@ -76,6 +78,8 @@ class MyCartController extends GetxController {
         selectedCartItems.value = cartModel.value.data ?? [];
         changeListen();
         isLoading.value = false;
+        Get.put(CustomFloatingCartButtonController());
+        Get.find<CustomFloatingCartButtonController>().getMyCartData();
       });
     }
   }

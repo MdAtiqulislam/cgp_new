@@ -39,6 +39,8 @@ class OngoingOrderData {
   final String? shippingStatus;
   final String? title;
   final String? message;
+  final String? distance;
+  final String? duration;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final int? v;
@@ -50,6 +52,8 @@ class OngoingOrderData {
     this.shippingStatus,
     this.title,
     this.message,
+    this.distance,
+    this.duration,
     this.createdAt,
     this.updatedAt,
     this.v,
@@ -62,6 +66,8 @@ class OngoingOrderData {
     shippingStatus: json["shippingStatus"],
     title: json["title"],
     message: json["message"],
+    distance: json["distance"],
+    duration: json["duration"],
     createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
     updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
     v: json["__v"],
@@ -74,6 +80,8 @@ class OngoingOrderData {
     "shippingStatus": shippingStatus,
     "title": title,
     "message": message,
+    "distance": distance,
+    "duration": duration,
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
     "__v": v,

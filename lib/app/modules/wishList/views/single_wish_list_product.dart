@@ -1,3 +1,4 @@
+import 'package:cgp/common_widgets/custom_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -14,13 +15,12 @@ class SingleWishListProduct extends StatelessWidget {
   final Function()? delete;
   final Function()? addToCart;
 
-  const SingleWishListProduct({
-    super.key,
-    required this.index,
-    required this.product,
-    this.delete,
-    this.addToCart
-  });
+  const SingleWishListProduct(
+      {super.key,
+      required this.index,
+      required this.product,
+      this.delete,
+      this.addToCart});
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +36,11 @@ class SingleWishListProduct extends StatelessWidget {
                 borderRadius:
                     BorderRadius.circular(AppDimensions.borderRadius.r),
               ),
-              child: Image.asset(
-                "assets/images/moc_image_${index % 10}.png",
-                fit: BoxFit.fill,
+              child: CustomNetworkImage(
+                image: (product.imgUrls ?? []).isNotEmpty
+                    ? product.imgUrls?.first ?? ""
+                    : "",
+                localImage: AppImagePath.noImage,
               ),
             ),
             SizedBox(
@@ -50,7 +52,7 @@ class SingleWishListProduct extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   HeaderText(
-                    text: product.productName??"",
+                    text: product.productName ?? "",
                     size: 10,
                   ),
                   SizedBox(
@@ -60,13 +62,13 @@ class SingleWishListProduct extends StatelessWidget {
                     contentPadding: 60,
                     fontSize: 10,
                     lineHeight: 0.99,
-                    price: double.parse(product.regularPrice??"0.0"),
-                    sizeLength:product.sizeLength??"",
-                    sizeWidth:product.sizeWidth??"",
-                    sizeHeight:product.sizeHeight??"",
-                    brand:product.brandName??"",
-                    material:product.materials??"",
-                    weight: product.weight??"",
+                    price: double.parse(product.regularPrice ?? "0.0"),
+                    sizeLength: product.sizeLength ?? "",
+                    sizeWidth: product.sizeWidth ?? "",
+                    sizeHeight: product.sizeHeight ?? "",
+                    brand: product.brandName ?? "",
+                    material: product.materials ?? "",
+                    weight: product.weight ?? "",
                   )
                 ],
               ),
@@ -79,8 +81,8 @@ class SingleWishListProduct extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
-                  onPressed: (){
-                    if(delete!=null){
+                  onPressed: () {
+                    if (delete != null) {
                       delete!();
                     }
                   },
@@ -98,11 +100,11 @@ class SingleWishListProduct extends StatelessWidget {
           bottom: 0,
           child: InkWell(
             onTap: () {
-              if(addToCart!=null){
+              if (addToCart != null) {
                 addToCart!();
               }
             },
-            child: Center(
+            child: const Center(
               child: HeaderText(
                 text: "Add To Cart",
                 color: AppColors.primaryColor,

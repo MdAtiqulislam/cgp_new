@@ -1,5 +1,6 @@
 import 'package:cgp/app/modules/cart/models/my_cart_model.dart';
 import 'package:cgp/app/modules/cart/myCart/controllers/my_cart_controller.dart';
+import 'package:cgp/app/modules/home/controllers/home_controller.dart';
 import 'package:cgp/app/modules/home/models/home_data_model.dart';
 import 'package:cgp/app/modules/productDetails/models/product_details_model.dart';
 import 'package:cgp/app/modules/productDetails/models/similar_products_model.dart';
@@ -12,6 +13,7 @@ import 'package:cgp/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../../customFloatingCartButton/custom_floating_cart_button_controller.dart';
 import '../../wishList/models/wish_list_model.dart';
 
 class ProductDetailsController extends GetxController {
@@ -152,6 +154,8 @@ class ProductDetailsController extends GetxController {
         CustomSnackBar(msg: response["message"], isSuccess: true)
             .showSnackBar();
       });
+      Get.put(CustomFloatingCartButtonController());
+      Get.find<CustomFloatingCartButtonController>().getMyCartData();
     }
   }
 
@@ -169,6 +173,8 @@ class ProductDetailsController extends GetxController {
         Get.find<MyCartController>().getMyCartData();
         CustomSnackBar(msg: response["message"], isSuccess: true)
             .showSnackBar();
+        Get.put(CustomFloatingCartButtonController());
+        Get.find<CustomFloatingCartButtonController>().getMyCartData();
       });
     }
   }

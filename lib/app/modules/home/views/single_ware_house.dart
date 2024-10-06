@@ -1,54 +1,36 @@
 
+import 'package:cgp/common_widgets/custom_circle_avatar.dart';
+import 'package:cgp/constraints/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
+import '../../../../common_widgets/custom_network_image.dart';
+import '../../../../common_widgets/custom_ratings.dart';
 import '../../../../constraints/app_colors.dart';
 import '../../../../constraints/body_text.dart';
 import '../../../../constraints/dimensions.dart';
 import '../../../../constraints/header_text.dart';
-import '../../../../models/single_warehouse_model.dart';
+import '../../../../models/single_warehouse_branch_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../shopDetails/controllers/shop_details_controller.dart';
-import '../models/home_data_model.dart';
-
 
 class SingleWareHouse extends StatelessWidget {
-  final int index;
-  final SingleWarehouseModel warehouse;
-  final List<Category> categoryList;
-  final String subTitle;
-  final String address;
-  final Future<String?> distanceFuture; // Future for distance
+  final SingleWarehouseBranchModel warehouse;
+  final String distance; // Rx for distance
 
   const SingleWareHouse({
-    required this.index,
+    required this.distance,
     required this.warehouse,
-    required this.categoryList,
-    required this.subTitle,
-    required this.address,
-    required this.distanceFuture,
     super.key,
   });
-
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: distanceFuture,
-      builder: (context, snapshot) {
-        final distance = snapshot.data ?? "__";
-        return _buildSingleWarehouse(distance);
-      },
-    );
-  }
-
-  Widget _buildSingleWarehouse(String distance) {
+  Widget build(BuildContext context){
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: const [BoxShadow(color: AppColors.shadowColor, blurRadius: 10)],
-        borderRadius: BorderRadius.circular(AppDimensions.borderRadius),
+        borderRadius: BorderRadius.circular(AppDimensions.borderRadius.r),
         border: Border.all(width: 1, color: AppColors.shadowColor),
       ),
       child: Material(
@@ -56,16 +38,19 @@ class SingleWareHouse extends StatelessWidget {
         child: InkWell(
           onTap: () {
             Get.put(ShopDetailsController());
-            Get.find<ShopDetailsController>().categoryList.value = categoryList;
-            Get.find<ShopDetailsController>().getDetails(id: warehouse.id ?? "");
-            Get.find<ShopDetailsController>().getProductsByWareHouse(wareHouseId: warehouse.id ?? "");
+            Get.find<ShopDetailsController>().wareHouseId.value=warehouse.id ?? "";
+            Get.find<ShopDetailsController>().branchId.value=warehouse.branchInfo?.id ?? "";
+            Get.find<ShopDetailsController>().branchType.value = warehouse.branchInfo?.branchType??"";
+            Get.find<ShopDetailsController>().getWarehouseDetails();
+            Get.find<ShopDetailsController>().getBranchDetails();
+            Get.find<ShopDetailsController>().getProducts();
             Get.toNamed(Routes.SHOP_DETAILS);
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                flex: 5,
+                flex: 6,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -75,8 +60,9 @@ class SingleWareHouse extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppDimensions.borderRadius),
                         color: AppColors.placeholderColor,
                       ),
-                      child: Image.asset(
-                        "assets/images/moc_image_${index%10}.png",
+                      child: CustomNetworkImage(
+                        image: warehouse.thumbnailUrl ?? "",
+                        localImage: AppImagePath.warehouse,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -91,7 +77,7 @@ class SingleWareHouse extends StatelessWidget {
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Colors.black.withOpacity(.8),
+                              Colors.black.withAlpha((.8*255).toInt()),
                               Colors.transparent,
                             ],
                           ),
@@ -104,32 +90,39 @@ class SingleWareHouse extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const BodyText(
-                            text: "Always open",
-                            color: Colors.white,
-                            size: 14,
-                            resize: false,
-                          ),
-                          SizedBox(height: 3.h),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              for (int i = 0; i < 5; i++)
-                                Icon(
-                                  Icons.star,
-                                  color: i < 4 ? AppColors.warningColor : Colors.white,
-                                  size: 14,
-                                ),
-                            ],
+                          CustomRatingWidget(
+                            ratingValue: double.parse("${warehouse.avgRating?.averageRating ?? 0}"),
+                            textColor: Colors.white,
                           ),
                         ],
+                      ),
+                    ),
+                  if(warehouse.logoUrl!=null)  Positioned(
+                      top: AppDimensions.contentPadding,
+                      left: AppDimensions.contentPadding,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                         // color: AppColors.borderColor,
+                          color: Colors.black38,
+                          border: Border.all(color: AppColors.borderColor,width: 2)
+                        ),
+                        child: CustomCircleAvatar(
+                            width: 50.r,
+                            height: 50.r,
+                            image: warehouse.logoUrl??"",
+                          fit: BoxFit.cover,
+                          bgColor: Colors.transparent,
+                          localImage: AppImagePath.noImage,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
               Expanded(
-                flex: 5,
+                flex: 4,
                 child: Padding(
                   padding: const EdgeInsets.all(AppDimensions.contentPadding),
                   child: Column(
@@ -137,54 +130,32 @@ class SingleWareHouse extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       HeaderText(
-                        text: warehouse.name ?? "",
+                        text: "${warehouse.name ?? ""}: ${warehouse.branchInfo?.name ?? ""}",
                         color: AppColors.primaryColor,
                         size: 13,
-                        resizeable: false,
+                       // resizeable: false,
                         maxLine: 2,
                         align: TextAlign.start,
                       ),
-                      Text.rich(
-                        TextSpan(
-                          text: "Items: ",
-                          style: TextStyle(
-                            color: AppColors.bodyTextColor,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: warehouse.brands?.join(", "),
-                              style: TextStyle(
-                                color: AppColors.bodyTextColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        textAlign: TextAlign.start,
-                      ),
-                      SizedBox(height: AppDimensions.contentPadding),
+                      SizedBox(height: AppDimensions.contentPadding.h),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
                             padding: EdgeInsets.only(top: 3.h, right: 3.w),
-                            child: Icon(
+                            child:  Icon(
                               Icons.location_on_sharp,
                               color: AppColors.primaryColor,
-                              size: 12,
+                              size: 12.spMin,
                             ),
                           ),
                           Expanded(
                             child: BodyText(
-                              text: warehouse.mainBranch?.address ?? "",
+                              text: warehouse.branchInfo?.address ?? "",
                               size: 12,
-                              resize: false,
+                             // resize: false,
                               align: TextAlign.start,
+                              maxLine: 2,
                             ),
                           ),
                         ],
@@ -194,17 +165,17 @@ class SingleWareHouse extends StatelessWidget {
                         children: [
                           Padding(
                             padding: EdgeInsets.only(top: 3.h, right: 3.w),
-                            child: Icon(
+                            child:  Icon(
                               Icons.fire_truck,
                               color: AppColors.primaryColor,
-                              size: 12,
+                              size: 12.spMin,
                             ),
                           ),
                           Expanded(
                             child: BodyText(
-                              text: "$distance away",
+                              text: distance,
                               size: 12,
-                              resize: false,
+                             // resize: false,
                               align: TextAlign.start,
                             ),
                           ),
@@ -221,6 +192,8 @@ class SingleWareHouse extends StatelessWidget {
     );
   }
 }
+
+
 
 
 

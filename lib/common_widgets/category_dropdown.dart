@@ -40,14 +40,6 @@ class CategoryDropdown extends StatelessWidget {
           Get.find<CategorySearchController>().loadData(categoryId: value?.id??"");
           Get.find<CategorySearchController>().dropDownController.text=value?.name??"";
           Get.toNamed(Routes.CATEGORY_SEARCH);
-
-          /* if (onChange != null) {
-            onChange!(value?.name??"");
-            dropdownSearchFieldController.text=value?.name??"";
-          }else{
-            Get.put(CategorySearchController());
-            Get.find<CategorySearchController>().loadData(categoryId: value?.id??"");
-          }*/
         },
         menuHeight: 300.h,
       //  enableSearch: false,
@@ -81,59 +73,7 @@ class CategoryDropdown extends StatelessWidget {
 
 
     );
-
-   /* GestureDetector(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(borderRadius??AppDimensions.borderRadius.r),
-          color: AppColors.iconColor
-        ),
-        child: DropDownSearchFormField<Category>(
-          suggestionsBoxController: suggestionsBoxController,
-             suggestionsCallback: (pattern) {
-          return getSuggestions(pattern);
-        },
-          transitionBuilder: (context, suggestionsBox, controller) {
-            return suggestionsBox;
-          },
-            onSuggestionSelected: ( value) {
-              if (onChange != null) {
-                onChange!(value.name??"");
-                dropdownSearchFieldController.text=value.name??"";
-              }
-            },
-            displayAllSuggestionWhenTap: true,
-
-          itemBuilder: (context, suggestion) {
-            return ListTile(
-              title: Text(suggestion.name??""),
-            );
-          },
-          itemSeparatorBuilder: (context, index) {
-            return const Divider();
-          },
-
-          textFieldConfiguration: TextFieldConfiguration(
-
-            controller: dropdownSearchFieldController,
-            cursorColor: Colors.white,
-            style: TextStyle(color: Colors.white,fontSize: 16.sp,fontWeight: FontWeight.w600),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: AppDimensions.horizontalPadding.w,vertical: 10.h),
-              suffixIcon:Image.asset(AppImagePath.dropdownIconWhite),
-              hintText: hintText,
-              hintStyle: TextStyle(color: Colors.white,fontSize: 16.sp,fontWeight: FontWeight.w600,))
-            ),
-
-          ),
-
-        ),
-    );*/
   }
-
-
-
 
   List<Category> getSuggestions(String query) {
     List<Category> matches = <Category>[];

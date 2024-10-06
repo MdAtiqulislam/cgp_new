@@ -2,6 +2,7 @@ class APIEndPoints {
 
   //static const baseUrl = "https://raw-bertie-wittyplex.koyeb.app";
   static const baseUrl = "https://cgp-customer-api-dev.onrender.com";
+  static const baseUrlMessaging = "https://laravel-api.tradebar.com.au";
 
 
   static const login = "/auth/login";
@@ -77,6 +78,34 @@ class APIEndPoints {
   static const addReview="/reviews";
 
   static const getOngoingOrder="/orders/ongoing-order/{orderId}";
+
+  static const hasDefaultPaymentMethod="/payment-method/has-default";
+
+  static const getSupportList="/api/v1/messaging/ajax/customer-support-list";
+
+  static const getIssueSubjectList="/api/v1/messaging/ajax/issue-subject-list";
+
+  static const createSupportEndPoint="/api/v1/messaging/ajax/create-support";
+
+  static const faqEndPoint="/api/v1/messaging/ajax/faq-list";
+
+  static const getTermsAndCondition="/api/v1/messaging/ajax/get-terms-condition";
+
+  static const searchWarehouse="/search/warehouses";
+
+  static const wareHouseBranchDetails="/warehouses/branches/";
+
+  static const getProductByWareHouseBranch="/warehouse/branches/{branchId}/products";
+
+  static const getWareHousesBranches="/warehouses/branches/all";
+
+  static const homeDataWithWarehouseBranch="/home/with-branch";
+
+  static const appVersionEndpoint="/app/version";
+
+  static const removeAccount="/customers/remove-account";
+
+  static const loggedInCustomerProfile="/customers/profile";
 
 
 

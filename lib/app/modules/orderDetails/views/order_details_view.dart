@@ -481,16 +481,17 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
                             Get.find<MessagingController>().orderDetails.value=controller.orderDetails.value;
                             Get.find<MessagingController>().imageLink.value=controller.orderDetails.value.data?.deliveryInfo?.rider?.url??"";
                             Get.find<MessagingController>().chatWith.value=controller.orderDetails.value.data?.deliveryInfo?.rider?.name??"";
+                            Get.find<MessagingController>().loadPreviousMessage();
                             Get.toNamed(Routes.MESSAGING);
                           },
                           child: Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.message,
                                 color: AppColors.primaryColor,
                               ),
                               SizedBox(width: AppDimensions.contentPadding.w,),
-                              HeaderText(text: "Live chat with roder",color: AppColors.primaryColor,)
+                              const HeaderText(text: "Live chat with rider",color: AppColors.primaryColor,)
                             ],
                           ),
                         )
@@ -708,13 +709,15 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemBuilder: (buildContext, index) {
-                                    return SingleCancelReasonCard(
-                                      cancelReason: controller
-                                              .cancelReasonsModel
-                                              .value
-                                              .data?[index] ??
-                                          CancelReasonModel(),
-                                    );
+                                    final cancelReason = controller.cancelReasonsModel.value.data?[index];
+
+                                    return Obx(()=>SingleCancelReasonCard(
+                                      reason: cancelReason?.reason ?? 'Unknown Reason',
+                                      isSelected: controller.selectedCancelReason.value.id == cancelReason?.id,
+                                      onTap: () {
+                                        controller.selectedCancelReason.value = cancelReason ?? CancelReasonModel();
+                                      },
+                                    ));
                                   },
                                   separatorBuilder: (buildContext, index) {
                                     return const Divider();
@@ -751,6 +754,9 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
       ),
     );
   }
+
+
+
 
   Widget reviewButton() {
     return Padding(

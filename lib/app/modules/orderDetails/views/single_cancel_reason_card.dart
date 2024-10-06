@@ -1,3 +1,4 @@
+/*
 import 'package:cgp/app/modules/orderDetails/controllers/order_details_controller.dart';
 import 'package:cgp/constraints/app_colors.dart';
 import 'package:cgp/constraints/header_text.dart';
@@ -12,6 +13,7 @@ class SingleCancelReasonCard extends GetView<OrderDetailsController> {
   final CancelReasonModel cancelReason;
   const SingleCancelReasonCard(
       {super.key, required this.cancelReason});
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,3 +41,67 @@ class SingleCancelReasonCard extends GetView<OrderDetailsController> {
     ),);
   }
 }
+
+
+ */
+
+import 'package:cgp/app/modules/orderDetails/controllers/order_details_controller.dart';
+import 'package:cgp/constraints/app_colors.dart';
+import 'package:cgp/constraints/header_text.dart';
+import 'package:cgp/models/cancel_reason_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+
+import '../../../../constraints/dimensions.dart';
+
+import 'package:flutter/material.dart';
+
+class SingleCancelReasonCard extends StatelessWidget {
+  final String reason;
+  final bool isSelected;
+  final Function() onTap;
+
+  const SingleCancelReasonCard({
+    super.key,
+    required this.reason,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                isSelected ? Icons.circle : Icons.circle_outlined,
+                color: isSelected ? Colors.green : Colors.grey,
+                size: 16,
+              ),
+              const SizedBox(width: 8.0),
+              Expanded(
+                child: Text(
+                  reason,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12.0,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

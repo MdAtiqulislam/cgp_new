@@ -37,7 +37,7 @@ class BodyText extends StatelessWidget {
 
       style: TextStyle(
         color: color,
-        fontSize:resize? size.sp:size,
+        fontSize:resize? size.spMin:size,
         fontWeight: fontWeight,
         height: lineHeight
       ),

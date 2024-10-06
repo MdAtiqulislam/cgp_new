@@ -1,6 +1,7 @@
 import 'package:cgp/app/modules/cart/models/my_cart_model.dart';
 import 'package:cgp/app/modules/cart/myCart/controllers/my_cart_controller.dart';
 import 'package:cgp/common_widgets/custom_check_box.dart';
+import 'package:cgp/common_widgets/custom_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -51,9 +52,9 @@ class SingleCartItem extends GetView<MyCartController> {
                     borderRadius:
                         BorderRadius.circular(AppDimensions.borderRadius.r),
                   ),
-                  child: Image.asset(
-                    "assets/images/moc_image_${index % 10}.png",
-                    fit: BoxFit.fill,
+                  child: CustomNetworkImage(
+                      image: (cartItem.product?.imgUrls??[]).isNotEmpty?cartItem.product?.imgUrls?.first??"":"",
+                  localImage: AppImagePath.noImage,
                   ),
                 ),
                 SizedBox(

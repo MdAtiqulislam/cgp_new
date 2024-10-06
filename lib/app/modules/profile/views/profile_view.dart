@@ -58,7 +58,7 @@ class ProfileView extends GetView<ProfileController> {
                       SizedBox(
                         height: AppDimensions.sectionPadding.h,
                       ),*/
-                    //  paymentMethodSection()
+                      //  paymentMethodSection()
                     ],
                   ),
                 ),
@@ -77,22 +77,30 @@ class ProfileView extends GetView<ProfileController> {
       children: [
         Column(
           children: [
-            CustomCircleAvatar(
-              width: 80,
-              height: 80,
-              image: controller.customer.value.profileImageUrl ?? "",
-              fit: BoxFit.contain,
+            Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  // color: AppColors.borderColor,
+                  color: Colors.black38,
+                  border: Border.all(color: AppColors.borderColor, width: 2)),
+              child: CustomCircleAvatar(
+                width: 80.r,
+                height: 80.r,
+                image: controller.customer.value.url ?? "",
+                fit: BoxFit.cover,
+              ),
             ),
             SizedBox(
               height: AppDimensions.widgetPadding.h,
             ),
-            InkWell(
+            /*InkWell(
               onTap: () {},
               child: const BodyText(
                 text: "Change Picture",
                 color: AppColors.primaryColor,
               ),
-            )
+            )*/
           ],
         ),
         SizedBox(
@@ -123,7 +131,9 @@ class ProfileView extends GetView<ProfileController> {
                   ),
                   Expanded(
                     child: BodyText(
-                        text: (controller.customer.value.userId ?? 0).toString(),align: TextAlign.start,),
+                      text: (controller.customer.value.userId ?? 0).toString(),
+                      align: TextAlign.start,
+                    ),
                   )
                 ],
               ),
@@ -136,7 +146,12 @@ class ProfileView extends GetView<ProfileController> {
                   SizedBox(
                     width: AppDimensions.contentPadding.w,
                   ),
-                  Expanded(child: BodyText(text: controller.customer.value.email ?? "N/A",align: TextAlign.start,),),
+                  Expanded(
+                    child: BodyText(
+                      text: controller.customer.value.email ?? "N/A",
+                      align: TextAlign.start,
+                    ),
+                  ),
                 ],
               ),
               Row(
@@ -175,7 +190,7 @@ class ProfileView extends GetView<ProfileController> {
                   (controller.customer.value.dateOfBirth != null)
                       ? BodyText(
                           text: calculateAge(
-                                  controller.customer.value.dateOfBirth)
+                                  controller.customer.value.dateOfBirth.toString())
                               .toString(),
                         )
                       : const BodyText(text: "N/A"),

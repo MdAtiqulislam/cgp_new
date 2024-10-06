@@ -60,7 +60,7 @@ class MyCartView extends GetView<MyCartController> {
                     SliverToBoxAdapter(
                       child: Row(
                         children: [
-                          CustomCircleAvatar(
+                          const CustomCircleAvatar(
                             width: 30,
                             height: 30,
                             image: "",
@@ -165,7 +165,7 @@ class MyCartView extends GetView<MyCartController> {
           childCount: controller.recommendedProducts.length,
               (buildContext, index) {
             return SingleGridItem(
-              index: index,
+             // index: index,
               product: controller.recommendedProducts[index],
               onTap: () {
                 Get.put(ProductDetailsController());

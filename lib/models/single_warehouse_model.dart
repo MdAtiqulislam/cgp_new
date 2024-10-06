@@ -4,6 +4,8 @@ class SingleWarehouseModel {
   final String? id;
   final String? name;
   final String? abnNumber;
+  final String? logoUrl;
+  final String? thumbnailUrl;
   final int? active;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -21,12 +23,16 @@ class SingleWarehouseModel {
     this.mainBranch,
     this.categories,
     this.brands,
+    this.logoUrl,
+    this.thumbnailUrl
   });
 
   factory SingleWarehouseModel.fromJson(Map<String, dynamic> json) => SingleWarehouseModel(
     id: json["id"],
     name: json["name"],
     abnNumber: json["abn_number"],
+    logoUrl: json["logo_url"],
+    thumbnailUrl: json["thumbnail_url"],
     active: json["active"],
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
@@ -39,6 +45,8 @@ class SingleWarehouseModel {
     "id": id,
     "name": name,
     "abn_number": abnNumber,
+    "logo_url": logoUrl,
+    "thumbnail_url": thumbnailUrl,
     "active": active,
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),

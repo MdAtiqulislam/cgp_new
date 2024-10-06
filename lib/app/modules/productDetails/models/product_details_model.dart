@@ -68,6 +68,7 @@ class ProductDetailsDataModel {
   final String? brandName;
   final Brand? brand;
   final List<ProductDetailsWarehouseModel>? warehouses;
+  final List<String>? imgUrls;
 
   ProductDetailsDataModel({
     this.id,
@@ -103,6 +104,7 @@ class ProductDetailsDataModel {
     this.brandName,
     this.brand,
     this.warehouses,
+    this.imgUrls,
   });
 
   factory ProductDetailsDataModel.fromJson(Map<String, dynamic> json) => ProductDetailsDataModel(
@@ -138,6 +140,7 @@ class ProductDetailsDataModel {
     categoryName: json["category_name"],
     brandName: json["brand_name"],
     brand: json["brand"] == null ? null : Brand.fromJson(json["brand"]),
+    imgUrls: json["img_urls"] == null ? [] : List<String>.from(json["img_urls"]!.map((x) => x)),
     warehouses: json["warehouses"] == null ? [] : List<ProductDetailsWarehouseModel>.from(json["warehouses"]!.map((x) => ProductDetailsWarehouseModel.fromJson(x))),
   );
 
@@ -174,6 +177,7 @@ class ProductDetailsDataModel {
     "category_name": categoryName,
     "brand_name": brandName,
     "brand": brand?.toJson(),
+    "img_urls": imgUrls == null ? [] : List<dynamic>.from(imgUrls!.map((x) => x)),
     "warehouses": warehouses == null ? [] : List<dynamic>.from(warehouses!.map((x) => x.toJson())),
   };
 }

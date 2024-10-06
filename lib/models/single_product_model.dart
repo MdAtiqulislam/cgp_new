@@ -32,6 +32,7 @@ class SingleProductModel {
   final String? categoryName;
   final String? brandName;
   final List<ProductWarehouse>? warehouses;
+  final List<String>? imgUrls;
 
   SingleProductModel({
     this.id,
@@ -65,6 +66,7 @@ class SingleProductModel {
     this.categoryName,
     this.brandName,
     this.warehouses,
+    this.imgUrls,
   });
 
   factory SingleProductModel.fromJson(Map<String, dynamic> json) => SingleProductModel(
@@ -99,6 +101,8 @@ class SingleProductModel {
     categoryName: json["category_name"],
     brandName: json["brand_name"],
     warehouses: json["warehouses"] == null ? [] : List<ProductWarehouse>.from(json["warehouses"]!.map((x) => ProductWarehouse.fromJson(x))),
+    imgUrls: json["img_urls"] == null ? [] : List<String>.from(json["img_urls"]!.map((x) => x)),
+
   );
 
   Map<String, dynamic> toJson() => {
@@ -133,5 +137,7 @@ class SingleProductModel {
     "category_name": categoryName,
     "brand_name": brandName,
     "warehouses": warehouses == null ? [] : List<dynamic>.from(warehouses!.map((x) => x.toJson())),
+    "img_urls": imgUrls == null ? [] : List<dynamic>.from(imgUrls!.map((x) => x)),
+
   };
 }

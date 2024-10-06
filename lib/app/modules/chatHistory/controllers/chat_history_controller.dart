@@ -1,4 +1,5 @@
 import 'package:cgp/models/customer_model.dart';
+import 'package:cgp/services/api_endpoints.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -30,7 +31,7 @@ class ChatHistoryController extends GetxController {
   Future<void> getChatHistory() async {
     isLoading.value=true;
     var link =
-        "https://cgp.studypress.org/api/v1/messaging/ajax/get-user-list?&sender_id=${user.value.userId}";
+        "${APIEndPoints.baseUrlMessaging}/api/v1/messaging/ajax/get-user-list?&sender_id=${user.value.userId}";
     try {
       var response= await RemoteServices.chatGetRequest(link: link);
 
@@ -63,7 +64,7 @@ class ChatHistoryController extends GetxController {
   }
 
   Future<void>changeStatus({required String orderId,required String receiverId})async{
-    var url="https://cgp.studypress.org/api/v1/messaging/ajax/update-message-status";
+    var url="${APIEndPoints.baseUrlMessaging}/api/v1/messaging/ajax/update-message-status";
     var body={
       "order_id":orderId,
       "receiver_id":receiverId

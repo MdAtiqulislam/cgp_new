@@ -3,9 +3,12 @@ import 'package:cgp/app/modules/home/models/home_data_model.dart';
 import 'package:cgp/app/modules/wareHouses/models/ware_houses_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
 import '../../../../services/api_endpoints.dart';
 import '../../../../services/remote_services.dart';
+import '../../../../utils/utils.dart';
 
 class WareHousesController extends GetxController {
 
@@ -14,12 +17,14 @@ class WareHousesController extends GetxController {
   var dropDownController=TextEditingController();
 
   var categoryList=<Category>[].obs;
-  var wareHouses=WareHousesModel().obs;
+  var wareHouses=WarehouseBranchesModel().obs;
+  var currentLocation = Rx<LocationData?>(null);
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
-    getWareHouses();
+    currentLocation.value = await getCurrentLocation();
+   await getWareHouses();
    // getCategory();
   }
 
@@ -39,16 +44,29 @@ class WareHousesController extends GetxController {
   }*/
 
 
-  void getWareHouses() async {
-    var endPoint = APIEndPoints.getWareHouses;
+  Future<void> getWareHouses() async {
+    var endPoint = APIEndPoints.getWareHousesBranches;
     try {
       var response = await RemoteServices.getRequest(endPoint: endPoint);
       if (response != null) {
-        wareHouses.value = WareHousesModel.fromJson(response);
+        wareHouses.value = WarehouseBranchesModel.fromJson(response);
         //   getProductsByCategory(categoryId: categoryList.value.data?[0].id??"");
       }
     } finally {
       isLoading.value=false;
     }
   }
+
+  String calculateDistance({required double lat, required double lan}) {
+    var distance = lat != 0 && lan != 0 && currentLocation.value?.latitude!=null && currentLocation.value?.longitude!=null
+        ? formatDistance(
+        distanceInMeter: calculateDistanceInMeter(
+            LatLng(currentLocation.value?.latitude ?? 0,
+                currentLocation.value?.longitude ?? 0),
+            LatLng(lat, lan)))
+        : "--";
+    return distance;
+  }
+
+
 }
