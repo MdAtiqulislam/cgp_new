@@ -14,23 +14,39 @@ class ProductByWarehouseBranchModel {
   final String? status;
   final String? message;
   final ProductByWarehouseBranchData? data;
+  final int? total;
+  final int? perPage;
+  final int? currentPage;
+  final int? lastPage;
 
   ProductByWarehouseBranchModel({
     this.status,
     this.message,
     this.data,
+    this.total,
+    this.perPage,
+    this.currentPage,
+    this.lastPage,
   });
 
   factory ProductByWarehouseBranchModel.fromJson(Map<String, dynamic> json) => ProductByWarehouseBranchModel(
     status: json["status"],
     message: json["message"],
     data: json["data"] == null ? null : ProductByWarehouseBranchData.fromJson(json["data"]),
+    total: json["total"],
+    perPage: json["per_page"],
+    currentPage: json["current_page"],
+    lastPage: json["last_page"],
   );
 
   Map<String, dynamic> toJson() => {
     "status": status,
     "message": message,
     "data": data?.toJson(),
+    "total":total,
+    "per_page":perPage,
+    "current_page":currentPage,
+    "last_page":lastPage,
   };
 }
 

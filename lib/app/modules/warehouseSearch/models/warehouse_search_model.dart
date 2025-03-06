@@ -11,28 +11,44 @@ String wareHouseSearchModelToJson(WareHouseSearchModel data) => json.encode(data
 class WareHouseSearchModel {
   final String? message;
   final String? status;
-  final List<WarehouseSearchData>? data;
+  final List<SearchWarehouseModel>? data;
+  final int? total;
+  final int? perPage;
+  final int? currentPage;
+  final int? lastPage;
 
   WareHouseSearchModel({
     this.message,
     this.status,
     this.data,
+    this.total,
+    this.perPage,
+    this.currentPage,
+    this.lastPage,
   });
 
   factory WareHouseSearchModel.fromJson(Map<String, dynamic> json) => WareHouseSearchModel(
     message: json["message"],
     status: json["status"],
-    data: json["data"] == null ? [] : List<WarehouseSearchData>.from(json["data"]!.map((x) => WarehouseSearchData.fromJson(x))),
+    data: json["data"] == null ? [] : List<SearchWarehouseModel>.from(json["data"]!.map((x) => SearchWarehouseModel.fromJson(x))),
+    total: json["total"],
+    perPage: json["per_page"],
+    currentPage: json["current_page"],
+    lastPage: json["last_page"],
   );
 
   Map<String, dynamic> toJson() => {
     "message": message,
     "status": status,
     "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+    "total":total,
+    "per_page":perPage,
+    "current_page":currentPage,
+    "last_page":lastPage,
   };
 }
 
-class WarehouseSearchData {
+class SearchWarehouseModel {
   final String? id;
   final String? name;
   final String? abnNumber;
@@ -42,7 +58,7 @@ class WarehouseSearchData {
   final AvgRating? avgRating;
   final BranchInfo? branchInfo;
 
-  WarehouseSearchData({
+  SearchWarehouseModel({
     this.id,
     this.name,
     this.abnNumber,
@@ -53,7 +69,7 @@ class WarehouseSearchData {
     this.branchInfo,
   });
 
-  factory WarehouseSearchData.fromJson(Map<String, dynamic> json) => WarehouseSearchData(
+  factory SearchWarehouseModel.fromJson(Map<String, dynamic> json) => SearchWarehouseModel(
     id: json["id"],
     name: json["name"],
     abnNumber: json["abn_number"],

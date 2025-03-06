@@ -1,16 +1,15 @@
 import 'package:cgp/app/modules/home/models/home_data_model.dart';
 import 'package:cgp/app/modules/shopDetails/models/products_by_branch_model.dart';
-import 'package:cgp/app/modules/shopDetails/models/products_by_category_model.dart';
-import 'package:cgp/app/modules/shopDetails/models/products_by_ware_house_model.dart';
 import 'package:cgp/app/modules/shopDetails/models/ware_house_details_model.dart';
 import 'package:cgp/app/modules/shopDetails/models/warehouse_branch_details_model.dart';
 import 'package:cgp/models/single_address_model.dart';
+import 'package:cgp/models/single_product_model.dart';
 import 'package:cgp/services/api_endpoints.dart';
 import 'package:cgp/services/remote_services.dart';
-import 'package:cgp/utils/enams.dart';
 import 'package:cgp/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import '../../../../constraints/app_strings.dart';
 
 class ShopDetailsController extends GetxController {
   var isLoading = false.obs;
@@ -28,15 +27,27 @@ class ShopDetailsController extends GetxController {
 
  // var productsByCategoryf = ProductsByCategoryModel().obs;
  // var productsByWareHouse = ProductsByWareHouseModel().obs;
-  var products = ProductByWarehouseBranchModel().obs;
+  var productByWarehouseBranchModel = ProductByWarehouseBranchModel().obs;
+  var products=<SingleProductModel>[].obs;
 
   var distance = "".obs;
   var selectedShippingAddress=SingleAddressModel().obs;
   var isSelfPickup=true.obs;
 
+  ScrollController scrollController = ScrollController();
+
+  var showLoadingAnimation=true.obs;
+
   @override
   void onInit() {
     super.onInit();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        if (!isLoadingProduct.value && productByWarehouseBranchModel.value.currentPage!=productByWarehouseBranchModel.value.lastPage) {
+          getProducts();
+        }
+      }
+    });
   }
 
 
@@ -45,6 +56,7 @@ class ShopDetailsController extends GetxController {
 
   void getWarehouseDetails() async {
     isLoading.value = true;
+    showLoadingAnimation.value=true;
     var endPoint ="${APIEndPoints.wareHouseDetails}${wareHouseId.value}";
     try {
       var response = await RemoteServices.getRequest(endPoint: endPoint);
@@ -53,6 +65,7 @@ class ShopDetailsController extends GetxController {
       }
     } finally {
       isLoading.value = false;
+      showLoadingAnimation.value=false;
     }
   }
 
@@ -95,9 +108,16 @@ class ShopDetailsController extends GetxController {
 
     var endPoint=APIEndPoints.getProductByWareHouseBranch
         .replaceAll('{branchId}', branchId.value);
-    await RemoteServices.getRequest(endPoint: endPoint).then((value) {
+    var parameters={
+      "page":"${(productByWarehouseBranchModel.value.currentPage??0)+1}",
+      "perPage":AppStrings.paginationProductsPerPage
+    };
+    await RemoteServices.getRequest(endPoint: endPoint,parameters: parameters).then((value) {
       if (value!=null) {
-        products.value = ProductByWarehouseBranchModel.fromJson(value);
+        productByWarehouseBranchModel.value = ProductByWarehouseBranchModel.fromJson(value);
+        productByWarehouseBranchModel.value.data?.products?.forEach((value){
+          products.value.add(value);
+        });
       }
       isLoadingProduct.value = false;
     });

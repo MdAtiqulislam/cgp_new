@@ -19,9 +19,9 @@ import 'package:cgp/services/remote_services.dart';
 import 'package:cgp/utils/enams.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../other_controllers/appbar_controller.dart';
 import '../../notifications/controllers/notifications_controller.dart';
@@ -82,6 +82,8 @@ class TransportationController extends GetxController {
 
  var customer=CustomerModel().obs;
 
+  var activeSubmitButton=false.obs;
+
   @override
   void onInit() async{
     super.onInit();
@@ -122,8 +124,8 @@ class TransportationController extends GetxController {
 
   Future<void> calculateSummary() async {
     isLoading.value = true;
+    activeSubmitButton.value=false;
     var endPoint = APIEndPoints.calculateTransportSummary;
-
 
     var body = {
       "pickup_coordinates": selectedPickupAddress.value.id==null
@@ -140,6 +142,7 @@ class TransportationController extends GetxController {
       if (response != null) {
         calculationModel.value =
             TransportationCalculationModel.fromJson(response);
+        activeSubmitButton.value=true;
       } else {
         CustomSnackBar(msg: AppStrings.httpErrorMSG.value, isSuccess: false)
             .showSnackBar();
@@ -491,22 +494,27 @@ Future<void>  getCustomerData()async {
     Get.put(AppbarController());
     Get.find<AppbarController>().getNotifications();
   }
-  void handleForegroundNotification(BuildContext context) async {
-    const storage = FlutterSecureStorage();
-    //String? requestId = await storage.read(key: 'requestId');
-    String? notificationId = await storage.read(key: 'notificationId');
 
-    if ( notificationId != null) {
+
+  void handleForegroundNotification(BuildContext context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // String? requestId = prefs.getString('requestId');
+    String? notificationId = prefs.getString('notificationId');
+
+    if (notificationId != null) {
       // Assuming you have already registered the TripRequestController
       Get.put(NotificationsController());
       Get.find<NotificationsController>().getNotification();
       Get.toNamed(Routes.NOTIFICATIONS);
       Get.back();
+
       // Clear the saved data
-      await storage.delete(key: 'requestId');
-      await storage.delete(key: 'notificationId');
+      await prefs.remove('requestId');
+      await prefs.remove('notificationId');
     }
   }
+
+
 
   Future<bool> checkDefaultPaymentMethod() async {
     isLoading.value=true;

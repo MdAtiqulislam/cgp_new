@@ -19,15 +19,11 @@
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
-
     <!--    <style name="LaunchTheme" parent="Theme.AppCompat.Light.NoActionBar">
             <item name="android:windowBackground">@android:color/transparent</item>
         </style>-->
-
     <style name="Theme.AppCompat.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-
-
 </resources>

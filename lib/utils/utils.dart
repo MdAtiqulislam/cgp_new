@@ -34,24 +34,27 @@ Future<XFile?> picImage(ImageSource imageSource) async {
 
 Future<CroppedFile?> cropImage({required String filePath,  CropStyle? cropStyle}) async {
   return await ImageCropper().cropImage(
-    cropStyle: cropStyle??CropStyle.circle,
+
     sourcePath: filePath,
-    aspectRatioPresets: [
+ /*   aspectRatioPresets: [
       // CropAspectRatioPreset.square,
       //CropAspectRatioPreset.ratio3x2,
       CropAspectRatioPreset.original,
       // CropAspectRatioPreset.ratio4x3,
       //CropAspectRatioPreset.ratio16x9
-    ],
+    ],*/
     uiSettings: [
       AndroidUiSettings(
           toolbarTitle: 'Edit',
           toolbarColor: Colors.white,
           toolbarWidgetColor: AppColors.primaryColor,
           initAspectRatio: CropAspectRatioPreset.original,
-          lockAspectRatio: false),
+          lockAspectRatio: false,
+          cropStyle: cropStyle??CropStyle.circle,
+      ),
       IOSUiSettings(
         title: 'Edit',
+        cropStyle: cropStyle??CropStyle.circle,
       ),
     ],
   );
@@ -243,6 +246,7 @@ Future<LocationData?> getCurrentLocation() async {
   }
 }
 
+/*
 Future<String?> distanceFromMyLocation(
     {required String? latitude, required String? longitude}) async {
   if (latitude != null && longitude != null) {
@@ -267,6 +271,32 @@ Future<String?> distanceFromMyLocation(
     return null;
   }
 }
+*/
+
+Future<String?> distanceFromMyLocation(
+    {required String? latitude, required String? longitude}) async {
+  if (latitude != null && longitude != null) {
+    var currentLocation = await getCurrentLocation();
+    if (currentLocation != null) {
+      CustomLocation start = CustomLocation(
+          currentLocation.latitude ?? 0.0, currentLocation.longitude ?? 0.0);
+      CustomLocation end = CustomLocation(
+          double.parse(latitude), double.parse(longitude));
+
+      // Calculate distance in kilometers directly
+      var distanceInKm = calculateDistance(start, end); // Assuming this returns KM
+
+      var dis = "${distanceInKm.toStringAsFixed(2)} KM away";
+
+      return dis;
+    } else {
+      return null;
+    }
+  } else {
+    return null;
+  }
+}
+
 
 
 Future<WishListModel?> getWishListFromLocal()async{

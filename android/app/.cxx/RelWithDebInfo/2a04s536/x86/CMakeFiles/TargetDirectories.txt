@@ -1,0 +1,2 @@
+/Users/revinar/AndroidStudioProjects/cgp_new/android/app/.cxx/RelWithDebInfo/2a04s536/x86/CMakeFiles/rebuild_cache.dir
+/Users/revinar/AndroidStudioProjects/cgp_new/android/app/.cxx/RelWithDebInfo/2a04s536/x86/CMakeFiles/edit_cache.dir

@@ -7,6 +7,7 @@ import 'package:cgp/app/modules/trackOrder/controllers/track_order_controller.da
 import 'package:cgp/app/routes/app_pages.dart';
 import 'package:cgp/common_widgets/app_button.dart';
 import 'package:cgp/common_widgets/cart_page_header.dart';
+import 'package:cgp/common_widgets/custom_network_image.dart';
 import 'package:cgp/constraints/app_colors.dart';
 import 'package:cgp/constraints/app_strings.dart';
 import 'package:cgp/constraints/body_text.dart';
@@ -20,6 +21,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../common_widgets/custom_app_bar.dart';
 import '../../../../common_widgets/custom_loading_screen.dart';
+import '../../../../common_widgets/fullscreen_image_dialog.dart';
 import '../../../../common_widgets/my_drawer.dart';
 import '../../../../constraints/dimensions.dart';
 import '../../../../utils/utils.dart';
@@ -182,11 +184,13 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
               color: AppColors.primaryColor,
               size: 12,
             ),
-            SizedBox(width: AppDimensions.contentPadding.w,),
+            SizedBox(
+              width: AppDimensions.contentPadding.w,
+            ),
             Expanded(
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: AppDimensions.widgetPadding.w,
+                  horizontal: AppDimensions.contentPadding.w,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.green, // Background color
@@ -359,6 +363,39 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
                 ),
               ],
             ),
+
+            if((controller.orderDetails.value.data?.images??[]).isNotEmpty)
+              SizedBox(
+                height: 100.h,
+                child: ListView.builder(
+                 // shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: (controller.orderDetails.value.data?.images??[]).length,
+                  itemBuilder: (context, index) {
+                    var image=controller.orderDetails.value.data?.images?[index]??"";
+                    return GestureDetector(
+                      onTap: (){
+                        showDialog(
+                          context: context,
+                          builder: (context) => FullScreenImageDialog(
+                            images: controller.orderDetails.value.data?.images ?? [],
+                            initialIndex: index,
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red
+                        ),
+                        margin:  EdgeInsets.symmetric(
+                            horizontal: AppDimensions.contentPadding.w,vertical: AppDimensions.contentPadding.h),
+                        child: CustomNetworkImage(image: image),
+                      ),
+                    );
+                  },
+                ),
+              )
+
           ],
         )
       ],
@@ -407,8 +444,13 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
                     ],
                   ),
                   if (controller.orderDetails.value.data?.deliveryInfo
-                          ?.shippingStatus !=
-                      OrderStatus.delivered.name)
+                              ?.shippingStatus !=
+                          OrderStatus.delivered.name &&
+                      controller.orderDetails.value.data?.deliveryInfo
+                              ?.shippingStatus !=
+                          OrderStatus.cancelled.name&&
+                  controller.orderDetails.value.data?.deliveryInfo
+                      ?.shippingStatus?.toLowerCase() !="cancel")
                     Column(
                       children: [
                         Row(
@@ -443,13 +485,25 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
                         ),
                         InkWell(
                           onTap: () async {
+                            final phone = controller.orderDetails.value.data
+                                ?.deliveryInfo?.rider?.phone;
+
+                            // Add country code if missing
+                            final formattedPhone = phone != null
+                                ? (phone.startsWith('04') ? phone : '04$phone')
+                                : "";
+
                             final Uri launchUri = Uri(
                               scheme: 'tel',
-                              path: controller.orderDetails.value.data
-                                      ?.deliveryInfo?.rider?.phone ??
-                                  "",
+                              path: formattedPhone,
                             );
-                            await launchUrl(launchUri);
+
+                            if (formattedPhone.isNotEmpty) {
+                              await launchUrl(launchUri);
+                            } else {
+                              // Handle the case where the phone number is not available
+                              print('Phone number is missing');
+                            }
                           },
                           child: Row(
                             children: [
@@ -462,8 +516,15 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
                               ),
                               HeaderText(
                                 text: controller.orderDetails.value.data
-                                        ?.deliveryInfo?.rider?.phone ??
-                                    "",
+                                            ?.deliveryInfo?.rider?.phone !=
+                                        null
+                                    ? (controller.orderDetails.value.data!
+                                            .deliveryInfo!.rider!.phone!
+                                            .startsWith('04')
+                                        ? controller.orderDetails.value.data!
+                                            .deliveryInfo!.rider!.phone!
+                                        : '04${controller.orderDetails.value.data!.deliveryInfo!.rider!.phone!}')
+                                    : "",
                                 color: AppColors.primaryColor,
                               ),
                             ],
@@ -472,16 +533,22 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
                         SizedBox(
                           height: AppDimensions.widgetPadding.h,
                         ),
-
-
                         InkWell(
-                          onTap: (){
+                          onTap: () {
                             Get.put(MessagingController());
                             Get.find<MessagingController>().initValue();
-                            Get.find<MessagingController>().orderDetails.value=controller.orderDetails.value;
-                            Get.find<MessagingController>().imageLink.value=controller.orderDetails.value.data?.deliveryInfo?.rider?.url??"";
-                            Get.find<MessagingController>().chatWith.value=controller.orderDetails.value.data?.deliveryInfo?.rider?.name??"";
-                            Get.find<MessagingController>().loadPreviousMessage();
+                            Get.find<MessagingController>().orderDetails.value =
+                                controller.orderDetails.value;
+                            Get.find<MessagingController>().imageLink.value =
+                                controller.orderDetails.value.data?.deliveryInfo
+                                        ?.rider?.url ??
+                                    "";
+                            Get.find<MessagingController>().chatWith.value =
+                                controller.orderDetails.value.data?.deliveryInfo
+                                        ?.rider?.name ??
+                                    "";
+                            Get.find<MessagingController>()
+                                .loadPreviousMessage();
                             Get.toNamed(Routes.MESSAGING);
                           },
                           child: Row(
@@ -490,8 +557,13 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
                                 Icons.message,
                                 color: AppColors.primaryColor,
                               ),
-                              SizedBox(width: AppDimensions.contentPadding.w,),
-                              const HeaderText(text: "Live chat with rider",color: AppColors.primaryColor,)
+                              SizedBox(
+                                width: AppDimensions.contentPadding.w,
+                              ),
+                              const HeaderText(
+                                text: "Live chat with rider",
+                                color: AppColors.primaryColor,
+                              )
                             ],
                           ),
                         )
@@ -709,15 +781,24 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemBuilder: (buildContext, index) {
-                                    final cancelReason = controller.cancelReasonsModel.value.data?[index];
+                                    final cancelReason = controller
+                                        .cancelReasonsModel.value.data?[index];
 
-                                    return Obx(()=>SingleCancelReasonCard(
-                                      reason: cancelReason?.reason ?? 'Unknown Reason',
-                                      isSelected: controller.selectedCancelReason.value.id == cancelReason?.id,
-                                      onTap: () {
-                                        controller.selectedCancelReason.value = cancelReason ?? CancelReasonModel();
-                                      },
-                                    ));
+                                    return Obx(() => SingleCancelReasonCard(
+                                          reason: cancelReason?.reason ??
+                                              'Unknown Reason',
+                                          isSelected: controller
+                                                  .selectedCancelReason
+                                                  .value
+                                                  .id ==
+                                              cancelReason?.id,
+                                          onTap: () {
+                                            controller.selectedCancelReason
+                                                    .value =
+                                                cancelReason ??
+                                                    CancelReasonModel();
+                                          },
+                                        ));
                                   },
                                   separatorBuilder: (buildContext, index) {
                                     return const Divider();
@@ -754,9 +835,6 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
       ),
     );
   }
-
-
-
 
   Widget reviewButton() {
     return Padding(

@@ -491,6 +491,7 @@ class RemoteServices {
     }
   }
 
+
   static dynamic handleResponse(http.Response response) {
     if (isHttpStatusSuccess(response.statusCode)) {
       var responseData=json.decode(response.body);
@@ -521,6 +522,8 @@ class RemoteServices {
       return null;
     }
   }
+
+
   static Future<dynamic> multipartRequest({
     required String filePath,
     required String fieldName,

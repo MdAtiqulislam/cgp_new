@@ -15,7 +15,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class OrderDetailsController extends GetxController {
-  var isLoading = false.obs;
+  var isLoading = true.obs;
   var orderDetails = OrderDetailsModel().obs;
   var cancelReasonsModel = CancelReasonsModel().obs;
   var orderStatus="".obs;
@@ -47,7 +47,7 @@ class OrderDetailsController extends GetxController {
       var response = await RemoteServices.getRequest(endPoint: endPoint);
       if (response != null) {
         orderDetails.value = OrderDetailsModel.fromJson(response);
-        orderStatus.value=orderDetails.value.data?.deliveryInfo?.shippingStatus??"";
+        orderStatus.value=getFormattedStatus(orderDetails.value.data?.deliveryInfo?.shippingStatus??"");
         var origin = LatLng(
           orderDetails.value.data?.pickupAddress?.latitude ?? 0.0,
           orderDetails.value.data?.pickupAddress?.longitude ?? 0.0,
@@ -175,7 +175,7 @@ class OrderDetailsController extends GetxController {
       var response = await RemoteServices.getRequest(endPoint: endPoint);
       if (response != null) {
        var newOrderDetails = OrderDetailsModel.fromJson(response);
-        orderStatus.value=newOrderDetails.data?.deliveryInfo?.shippingStatus??"";
+        orderStatus.value=getFormattedStatus(newOrderDetails.data?.deliveryInfo?.shippingStatus??"");
       }
     } finally {
       isLoading.value = false;

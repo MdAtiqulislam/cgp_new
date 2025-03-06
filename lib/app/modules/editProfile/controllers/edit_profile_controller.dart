@@ -56,7 +56,8 @@ Future<void>  getUserData() async{
         customer.value=value;
         firstNameController.text=customer.value.firstName??"";
         lastNameController.text=customer.value.lastName??"";
-        phoneController.text=customer.value.phone??"";
+        //phoneController.text=customer.value.phone??"";
+        phoneController.text = customer.value.phone?.replaceFirst('04', '') ?? '';
         emailController.text=customer.value.email??"";
         selectedGender =
         ((customer.value.gender ?? "").isEmpty ? "MALE" : customer.value.gender)!;

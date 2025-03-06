@@ -232,22 +232,23 @@ class TransportationView extends GetView<TransportationController> {
           ),
           Expanded(
             child: IgnorePointer(
-              ignoring: controller.isLoading.value ||
+              ignoring: /*controller.isLoading.value ||
                   (controller.pickupPoint.isEmpty &&
                       controller.selectedPickupAddress.value.id == null) ||
                   (controller.destinationPoint.isEmpty &&
                       controller.selectedShippingAddress.value.id == null) ||
-                  controller.selectedVehicle.value.typeId == null,
+                  controller.selectedVehicle.value.typeId == null ||*/!controller.activeSubmitButton.value,
               child: AppButton(
                 text: "Submit",
-                bgColor: controller.isLoading.value ||
+                bgColor: /*controller.isLoading.value ||
                         (controller.pickupPoint.isEmpty &&
                             controller.selectedPickupAddress.value.id ==
                                 null) ||
                         (controller.destinationPoint.isEmpty &&
                             controller.selectedShippingAddress.value.id ==
                                 null) ||
-                        controller.selectedVehicle.value.typeId == null
+                        controller.selectedVehicle.value.typeId == null||*/
+                !controller.activeSubmitButton.value
                     ? AppColors.inactiveColor
                     : AppColors.primaryColor,
                 onTap: () async {

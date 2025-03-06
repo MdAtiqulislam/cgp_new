@@ -106,68 +106,6 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                           SizedBox(
                             height: AppDimensions.widgetPadding.h,
                           ),
-                         /* Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  controller.handelWishList(
-                                      id: controller.details.value.data?.id ??
-                                          "");
-                                },
-                                icon: controller.isFavourite.value
-                                    ? Icon(Icons.favorite_outlined)
-                                    : Icon(Icons.favorite_border),
-                              ),
-                              Row(
-                                children: [
-                                  IgnorePointer(
-                                    ignoring: controller.quantity.value <= 1,
-                                    child: IconButton(
-                                        onPressed: () {
-                                          controller.decrement();
-                                        },
-                                        icon: Icon(
-                                          Icons.remove_circle,
-                                          color: controller.quantity.value > 1
-                                              ? AppColors.secondaryColor
-                                              : AppColors.inactiveColor,
-                                        ),),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal:
-                                            AppDimensions.horizontalPadding.w),
-                                    child: HeaderText(
-                                      text:
-                                          controller.quantity.value.toString(),
-                                    ),
-                                  ),
-                                  IconButton(
-                                      onPressed: () {
-                                        controller.increment();
-                                      },
-                                      icon: Icon(
-                                        Icons.add_circle,
-                                        color: AppColors.secondaryColor,
-                                      )),
-                                ],
-                              ),
-
-                              MaterialButton(
-                                onPressed: () {
-                                  controller.handelMyCart();
-                                },
-                                  color:AppColors.primaryColor ,
-                                child: const Row(
-                                  children: [
-                                    Icon(Icons.shopping_cart,color: Colors.white,),
-                                    HeaderText(text: "Add to cart",color:Colors.white,)
-                                  ],
-                                )
-                              ),
-                            ],
-                          ),*/
-
                           Row(
                             children: [
                               IconButton(
@@ -421,7 +359,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                   ],
                 ),
               ),
-              if (controller.isLoading.value) const LoadingScreen()
+              if (controller.isLoading.value)  LoadingScreen(showAnimation: controller.showLoadingAnimation.value,)
             ],
           ),
         ),

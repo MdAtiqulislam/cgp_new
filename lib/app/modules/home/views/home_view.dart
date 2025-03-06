@@ -1,9 +1,9 @@
-
 import 'package:cgp/app/modules/customFloatingCartButton/custom_floating_cart_button.dart';
 import 'package:cgp/app/modules/home/views/single_grid_item.dart';
 import 'package:cgp/app/modules/home/views/single_ware_house.dart';
 import 'package:cgp/app/modules/productDetails/controllers/product_details_controller.dart';
 import 'package:cgp/app/modules/wareHouses/controllers/ware_houses_controller.dart';
+import 'package:cgp/app/modules/wareHouses/models/ware_houses_model.dart';
 import 'package:cgp/app/routes/app_pages.dart';
 import 'package:cgp/common_widgets/category_dropdown.dart';
 import 'package:cgp/common_widgets/custom_app_bar.dart';
@@ -12,6 +12,7 @@ import 'package:cgp/common_widgets/custom_search_bar.dart';
 import 'package:cgp/common_widgets/custom_title.dart';
 import 'package:cgp/common_widgets/my_drawer.dart';
 import 'package:cgp/constraints/app_colors.dart';
+import 'package:cgp/constraints/app_strings.dart';
 import 'package:cgp/constraints/body_text.dart';
 import 'package:cgp/constraints/dimensions.dart';
 import 'package:cgp/models/single_warehouse_branch_model.dart';
@@ -39,13 +40,15 @@ class HomeView extends GetView<HomeController> {
             scaffoldKey: scaffoldKey,
           ),
           drawer: MyDrawer(),
-          floatingActionButton:const CustomFloatingCartButton(),
+          floatingActionButton: const CustomFloatingCartButton(),
           body: Stack(
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppDimensions.horizontalPadding),
                 child: CustomScrollView(
+                  controller: homeController.scrollController,
+                  // Add scrollController here
                   slivers: [
                     SliverToBoxAdapter(
                       child: SizedBox(
@@ -56,7 +59,7 @@ class HomeView extends GetView<HomeController> {
                       child: CustomSearchBar(
                         enabled: false,
                         onTap: () {
-                         // Get.toNamed(Routes.SEARCH_PAGE);
+                          // Get.toNamed(Routes.SEARCH_PAGE);
                           Get.toNamed(Routes.WAREHOUSE_SEARCH);
                         },
                       ),
@@ -102,6 +105,16 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ),
                     itemsSection(),
+                    if (controller.isLoadingProduct.value)
+                      SliverToBoxAdapter(
+                        child: Center(
+                          child: Image.asset(
+                            AppImagePath.loadingAnimation,
+                            height: 48.r,
+                            width: 48.r,
+                          ),
+                        ),
+                      ),
                     SliverToBoxAdapter(
                       child: SizedBox(
                         height: AppDimensions.sectionPadding.h,
@@ -129,8 +142,9 @@ class HomeView extends GetView<HomeController> {
           child: ListView.builder(
               // padding: const EdgeInsets.symmetric(horizontal: AppDimensions.horizontalPadding),
               itemExtent: 200,
-              itemCount:
-                  homeController.homeDataModel.value.warehouseBranches?.length ?? 0,
+              itemCount: homeController
+                      .homeDataModel.value.warehouseBranches?.length ??
+                  0,
               // shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               itemBuilder: (buildContext, index) {
@@ -140,12 +154,24 @@ class HomeView extends GetView<HomeController> {
                     bottom: AppDimensions.contentPadding.h,
                   ),
                   child: SingleWareHouse(
-                   distance:   controller.calculateDistance(
-                       lat: double.parse(homeController.homeDataModel.value.warehouseBranches?[index].branchInfo?.latitude??"0"),
-                       lan: double.parse(homeController.homeDataModel.value.warehouseBranches?[index].branchInfo?.longitude??"0")),
-                    warehouse:
-                        homeController.homeDataModel.value.warehouseBranches?[index] ??
-                            SingleWarehouseBranchModel(),
+                    distance: controller.calculateDistance(
+                        lat: double.parse(homeController
+                                .homeDataModel
+                                .value
+                                .warehouseBranches?[index]
+                                .branchInfo
+                                ?.latitude ??
+                            "0"),
+                        lan: double.parse(homeController
+                                .homeDataModel
+                                .value
+                                .warehouseBranches?[index]
+                                .branchInfo
+                                ?.longitude ??
+                            "0")),
+                    warehouse: homeController
+                            .homeDataModel.value.warehouseBranches?[index] ??
+                        SingleWarehouseBranchModel(),
                   ),
                 );
               }),
@@ -158,6 +184,9 @@ class HomeView extends GetView<HomeController> {
             Get.put(WareHousesController());
             Get.find<WareHousesController>().categoryList.value =
                 homeController.homeDataModel.value.categories ?? [];
+            Get.find<WareHousesController>().wareHouseBranchesModel.value=WarehouseBranchesModel();
+            Get.find<WareHousesController>().warehouses.value=[];
+            Get.find<WareHousesController>().getWareHouses();
             Get.toNamed(Routes.WARE_HOUSES);
           },
           color: AppColors.secondaryColor,
@@ -178,17 +207,15 @@ class HomeView extends GetView<HomeController> {
   Widget itemsSection() {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate(
-          childCount: homeController.homeDataModel.value.products?.length ?? 0,
+          childCount: homeController.products.length ?? 0,
           (buildContext, index) {
         return SingleGridItem(
-          product: homeController.homeDataModel.value.products?[index] ??
-              SingleProductModel(),
-         // index: index,
+          product: homeController.products[index],
+          // index: index,
           onTap: () {
             Get.put(ProductDetailsController());
-            Get.find<ProductDetailsController>().getDetails(
-                id: homeController.homeDataModel.value.products?[index].id ??
-                    "");
+            Get.find<ProductDetailsController>()
+                .getDetails(id: homeController.products[index].id ?? "");
             /*  Get.find<ProductDetailsController>().categoryList.value =
                 controller.homeDataModel.value.categories ?? [];*/
             Get.toNamed(Routes.PRODUCT_DETAILS);
@@ -205,7 +232,8 @@ class HomeView extends GetView<HomeController> {
 
   Widget myFloatingButton() {
     return Stack(
-      clipBehavior: Clip.none, // Allows the badge to overflow the button's boundary
+      clipBehavior: Clip.none,
+      // Allows the badge to overflow the button's boundary
       children: [
         FloatingActionButton(
           shape: const CircleBorder(),
@@ -241,6 +269,4 @@ class HomeView extends GetView<HomeController> {
       ],
     );
   }
-
-
 }

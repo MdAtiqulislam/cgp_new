@@ -401,6 +401,7 @@ class OrderDetailsData {
   final List<OrderDetailsLineItem>? lineItems;
   final DeliveryInfo? deliveryInfo;
   final Reviews? reviews;
+  final List<dynamic>? images;
 
   OrderDetailsData({
     this.orderId,
@@ -418,7 +419,8 @@ class OrderDetailsData {
     this.shippingAddress,
     this.lineItems,
     this.deliveryInfo,
-    this.reviews
+    this.reviews,
+    this.images
   });
 
   factory OrderDetailsData.fromJson(Map<String, dynamic> json) => OrderDetailsData(
@@ -436,6 +438,7 @@ class OrderDetailsData {
     pickupAddress: json["pickup_address"] == null ? null : SingleAddressModel.fromJson(json["pickup_address"]),
     shippingAddress: json["shipping_address"] == null ? null : SingleAddressModel.fromJson(json["shipping_address"]),
     lineItems: json["line_items"] == null ? [] : List<OrderDetailsLineItem>.from(json["line_items"]!.map((x) => OrderDetailsLineItem.fromJson(x))),
+    images: json["images"],// == null ? [] : List<OrderDetailsLineItem>.from(json["line_items"]!.map((x) => OrderDetailsLineItem.fromJson(x))),
     deliveryInfo: json["delivery_info"] == null ? null : DeliveryInfo.fromJson(json["delivery_info"]),
     reviews: json["reviews"] == null ? null : Reviews.fromJson(json["reviews"]),
   );
@@ -457,6 +460,7 @@ class OrderDetailsData {
     "line_items": lineItems == null ? [] : List<dynamic>.from(lineItems!.map((x) => x.toJson())),
     "delivery_info": deliveryInfo?.toJson(),
     "reviews": reviews?.toJson(),
+    "images":images,
   };
 }
 

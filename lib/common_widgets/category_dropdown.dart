@@ -1,4 +1,5 @@
 import 'package:cgp/app/modules/categorySearch/controllers/category_search_controller.dart';
+import 'package:cgp/app/modules/categorySearch/models/warehouse_by_category_model.dart';
 import 'package:cgp/app/modules/home/models/home_data_model.dart';
 import 'package:cgp/app/routes/app_pages.dart';
 import 'package:cgp/constraints/app_colors.dart';
@@ -37,6 +38,8 @@ class CategoryDropdown extends StatelessWidget {
         onSelected: (value){
           dropdownSearchFieldController.text=value?.name??"";
           Get.put(CategorySearchController());
+          Get.find<CategorySearchController>().wareHouseByCategoryModel.value=WareHousesByCategoryModel();
+          Get.find<CategorySearchController>().warehousesList.value=[];
           Get.find<CategorySearchController>().loadData(categoryId: value?.id??"");
           Get.find<CategorySearchController>().dropDownController.text=value?.name??"";
           Get.toNamed(Routes.CATEGORY_SEARCH);

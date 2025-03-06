@@ -218,7 +218,7 @@ class PaymentMethodsView extends GetView<PaymentMethodsController> {
                 ],
               ),
             ),
-            if (controller.isLoading.value||!controller.isCardReady.value)
+            if (controller.isLoading.value)
               const Positioned(
                 left: 0,
                 right: 0,

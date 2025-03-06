@@ -1,31 +1,41 @@
 import 'package:cgp/app/modules/cart/models/my_cart_model.dart';
 import 'package:cgp/app/modules/customFloatingCartButton/custom_floating_cart_button_controller.dart';
-import 'package:cgp/app/modules/home/controllers/home_controller.dart';
 import 'package:cgp/common_widgets/custom_snackbar.dart';
 import 'package:cgp/services/api_endpoints.dart';
 import 'package:cgp/services/remote_services.dart';
 import 'package:cgp/utils/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../../../../../constraints/app_strings.dart';
 import '../../../../../models/allproductsModel.dart';
 import '../../../../../models/single_product_model.dart';
 
 class MyCartController extends GetxController {
   var isLoading = true.obs;
-  var isLoadingRecommended = false.obs;
+  var isLoadingProduct = false.obs;
   var selectAll = true.obs;
   var total = 0.0.obs;
 
   var selectedCartItems = <SingleCartModel>[].obs;
   var cartModel = MyCartModel().obs;
 
-  var recommendedProducts=<SingleProductModel>[].obs;
+  var productsModel=AllProductsModel().obs;
+  var products=<SingleProductModel>[].obs;
+  ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
     super.onInit();
     getMyCartData();
-    getRecommendedProducts();
+    getProducts();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        if (!isLoadingProduct.value && productsModel.value.currentPage!=productsModel.value.lastPage) {
+          getProducts();
+        }
+      }
+    });
   }
 
   @override
@@ -113,15 +123,23 @@ class MyCartController extends GetxController {
 
   }
 
-  void getRecommendedProducts()async {
-    isLoadingRecommended.value=true;
-    var endPoint=APIEndPoints.getAllProducts;
-    var allProductsModel=AllProductsModel();
-    var response=await RemoteServices.getRequest(endPoint: endPoint);
-    if(response!=null){
-      allProductsModel=AllProductsModel.fromJson(response);
-      recommendedProducts.value=allProductsModel.data??[];
-      isLoadingRecommended.value=false;
+  Future<void> getProducts() async {
+    isLoadingProduct.value = true;
+    const endPoint = APIEndPoints.getAllProducts;
+    var parameters={
+      "page":"${(productsModel.value.currentPage??0)+1}",
+      "perPage":AppStrings.paginationProductsPerPage
+    };
+    try {
+      final response = await RemoteServices.getRequest(endPoint: endPoint,parameters: parameters);
+      if (response != null) {
+        productsModel.value = AllProductsModel.fromJson(response);
+        productsModel.value.data?.forEach((value){
+          products.value.add(value);
+        });
+      }
+    } finally {
+      isLoadingProduct.value=false;
     }
   }
 }

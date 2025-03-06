@@ -1,6 +1,5 @@
 import 'package:cgp/app/modules/cart/models/my_cart_model.dart';
 import 'package:cgp/app/modules/cart/myCart/controllers/my_cart_controller.dart';
-import 'package:cgp/app/modules/home/controllers/home_controller.dart';
 import 'package:cgp/app/modules/home/models/home_data_model.dart';
 import 'package:cgp/app/modules/productDetails/models/product_details_model.dart';
 import 'package:cgp/app/modules/productDetails/models/similar_products_model.dart';
@@ -18,6 +17,7 @@ import '../../wishList/models/wish_list_model.dart';
 
 class ProductDetailsController extends GetxController {
   var isLoading = true.obs;
+  var isLoadingProduct = true.obs;
   var isFavourite = false.obs;
   var isCartItem = false.obs;
   var cartId="";
@@ -33,6 +33,8 @@ class ProductDetailsController extends GetxController {
   final selectedIndex = 0.obs;
   var dynamicText = "".obs;
 
+  var showLoadingAnimation=true.obs;
+
   @override
   void onInit() async {
     super.onInit();
@@ -47,6 +49,7 @@ class ProductDetailsController extends GetxController {
     checkMyCart(id: id);
 
     isLoading.value = true;
+    showLoadingAnimation.value = true;
     var endPoint = "${APIEndPoints.productDetails}$id";
     await RemoteServices.getRequest(endPoint: endPoint).then((value) {
       if (value != null) {
@@ -56,8 +59,10 @@ class ProductDetailsController extends GetxController {
         //this is for related product
        // getRelatedProduct(productId: details.value.data?.id ?? "");
         isLoading.value = false;
+        showLoadingAnimation.value = false;
       } else {
         isLoading.value = false;
+        showLoadingAnimation.value = false;
         CustomSnackBar(isSuccess: false, msg: AppStrings.httpErrorMSG.value)
             .showSnackBar();
       }
@@ -65,7 +70,7 @@ class ProductDetailsController extends GetxController {
   }
 
   void getRelatedProduct({required String productId}) async {
-    //  isLoadingProduct.value=true;
+      isLoadingProduct.value=true;
     var endPoint =
         APIEndPoints.getSimilarProducts.replaceAll('{productId}', productId);
     await RemoteServices.getRequest(endPoint: endPoint).then((value) {

@@ -210,19 +210,6 @@ class PusherService extends GetxService {
     );
   }
 
-/*  void initLocalNotification() {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/launcher_icon');
-    const InitializationSettings initializationSettings =
-    InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: onSelectNotification,
-    );
-  }*/
 
   void initLocalNotification() {
     // Android-specific initialization settings
@@ -249,7 +236,9 @@ class PusherService extends GetxService {
     // Initialize the plugin
     flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: onSelectNotification,
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+        await _handleNotificationTap(response);
+      },
     );
   }
 
@@ -297,6 +286,20 @@ class PusherService extends GetxService {
 
       Get.put(MessagingController());
       Get.find<MessagingController>().loadPreviousMessage();
+      Get.toNamed(Routes.MESSAGING);
+    }
+  }
+
+  Future<void> _handleNotificationTap(NotificationResponse response) async {
+    String? payload = response.payload;
+    if (payload != null) {
+      final messageData = jsonDecode(payload) as Map<String, dynamic>;
+
+      // Ensure MessagingController is initialized
+      Get.put(MessagingController());
+      Get.find<MessagingController>().loadPreviousMessage();
+
+      // Navigate to the Messaging screen
       Get.toNamed(Routes.MESSAGING);
     }
   }

@@ -5,6 +5,7 @@
 import 'dart:convert';
 
 import '../../home/models/home_data_model.dart';
+import '../../warehouseSearch/models/warehouse_search_model.dart';
 
 WareHousesByCategoryModel wareHousesByCategoryModelFromJson(String str) => WareHousesByCategoryModel.fromJson(json.decode(str));
 
@@ -13,39 +14,55 @@ String wareHousesByCategoryModelToJson(WareHousesByCategoryModel data) => json.e
 class WareHousesByCategoryModel {
   final String? message;
   final String? status;
-  final Data? data;
+  final WareHousesByCategoryData? data;
+  final int? total;
+  final int? perPage;
+  final int? currentPage;
+  final int? lastPage;
 
   WareHousesByCategoryModel({
     this.message,
     this.status,
     this.data,
+    this.total,
+    this.perPage,
+    this.currentPage,
+    this.lastPage,
   });
 
   factory WareHousesByCategoryModel.fromJson(Map<String, dynamic> json) => WareHousesByCategoryModel(
     message: json["message"],
     status: json["status"],
-    data: json["data"] == null ? null : Data.fromJson(json["data"]),
+    data: json["data"] == null ? null : WareHousesByCategoryData.fromJson(json["data"]),
+    total: json["total"],
+    perPage: json["per_page"],
+    currentPage: json["current_page"],
+    lastPage: json["last_page"],
   );
 
   Map<String, dynamic> toJson() => {
     "message": message,
     "status": status,
     "data": data?.toJson(),
+    "total":total,
+    "per_page":perPage,
+    "current_page":currentPage,
+    "last_page":lastPage,
   };
 }
 
-class Data {
+class WareHousesByCategoryData {
   final Category? category;
-  final List<WarehouseByCategory>? warehouses;
+  final List<SearchWarehouseModel>? warehouses;
 
-  Data({
+  WareHousesByCategoryData({
     this.category,
     this.warehouses,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
+  factory WareHousesByCategoryData.fromJson(Map<String, dynamic> json) => WareHousesByCategoryData(
     category: json["category"] == null ? null : Category.fromJson(json["category"]),
-    warehouses: json["warehouses"] == null ? [] : List<WarehouseByCategory>.from(json["warehouses"]!.map((x) => WarehouseByCategory.fromJson(x))),
+    warehouses: json["warehouses"] == null ? [] : List<SearchWarehouseModel>.from(json["warehouses"]!.map((x) => SearchWarehouseModel.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {

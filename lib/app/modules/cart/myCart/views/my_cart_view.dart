@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../../common_widgets/my_drawer.dart';
+import '../../../../../constraints/app_strings.dart';
 import '../../../../routes/app_pages.dart';
 import '../../../home/views/single_grid_item.dart';
 import '../../../productDetails/controllers/product_details_controller.dart';
@@ -43,113 +44,128 @@ class MyCartView extends GetView<MyCartController> {
               Padding(
                 padding: EdgeInsets.symmetric(
                     horizontal: AppDimensions.horizontalPadding.w),
-                child:(controller.cartModel.value.data??[]).isEmpty
-                    ?const EmptyCartView()
+                child: (controller.cartModel.value.data ?? []).isEmpty
+                    ? const EmptyCartView()
                     : CustomScrollView(
-                  slivers: [
-                    const SliverToBoxAdapter(
-                      child: CartPageHeader(
-                        trailingText: "Details",
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: AppDimensions.widgetPadding.h,
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Row(
-                        children: [
-                          const CustomCircleAvatar(
-                            width: 30,
-                            height: 30,
-                            image: "",
-                            localImage: "assets/images/moc_image_10.png",
-                            fit: BoxFit.fill,
-                          ),
-                          SizedBox(
-                            width: AppDimensions.widgetPadding.w,
-                          ),
-                         if((controller.cartModel.value.data?[0].product?.warehouses??[]).isNotEmpty) Expanded(
-                           child: HeaderText(
-                              text: "From ${controller.cartModel.value.data?[0].product?.warehouses?[0].warehouseName??""} (${controller.cartModel.value.data?.length??0} Items)",
-                              color: AppColors.primaryColor,
-                              size: 14,
+                        controller: controller.scrollController,
+                        slivers: [
+                          const SliverToBoxAdapter(
+                            child: CartPageHeader(
+                              trailingText: "Details",
                             ),
-                         ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: AppDimensions.widgetPadding.h,
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: Row(
+                              children: [
+                                const CustomCircleAvatar(
+                                  width: 30,
+                                  height: 30,
+                                  image: "",
+                                  localImage: "assets/images/moc_image_10.png",
+                                  fit: BoxFit.fill,
+                                ),
+                                SizedBox(
+                                  width: AppDimensions.widgetPadding.w,
+                                ),
+                                if ((controller.cartModel.value.data?[0].product
+                                            ?.warehouses ??
+                                        [])
+                                    .isNotEmpty)
+                                  Expanded(
+                                    child: HeaderText(
+                                      text:
+                                          "From ${controller.cartModel.value.data?[0].product?.warehouses?[0].warehouseName ?? ""} (${controller.cartModel.value.data?.length ?? 0} Items)",
+                                      color: AppColors.primaryColor,
+                                      size: 14,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: CustomCheckBox(
+                              label: "Select All",
+                              padding: EdgeInsets.symmetric(
+                                  vertical: AppDimensions.contentPadding.h),
+                              value: controller.selectAll.value,
+                              onChanged: (value) {
+                                controller.selectAll.value = value;
+                                if (value) {
+                                  controller.selectedCartItems.value = [];
+                                  controller.selectedCartItems.addAll(
+                                      controller.cartModel.value.data ?? []);
+                                  controller.changeListen();
+                                } else {
+                                  controller.selectedCartItems.value = [];
+                                  controller.changeListen();
+                                }
+                              },
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: AppDimensions.sectionPadding.h,
+                            ),
+                          ),
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                                childCount:
+                                    controller.cartModel.value.data?.length ??
+                                        0, (buildContext, index) {
+                              return Column(
+                                children: [
+                                  SingleCartItem(
+                                    index: index,
+                                    //  value: controller.selectedCartItems.contains(1),
+                                    cartItem: controller
+                                            .cartModel.value.data?[index] ??
+                                        SingleCartModel(),
+                                  ),
+                                  if (index <
+                                      (controller.cartModel.value.data
+                                                  ?.length ??
+                                              0) -
+                                          1)
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical:
+                                              AppDimensions.contentPadding.h),
+                                      child: Divider(),
+                                    )
+                                ],
+                              );
+                            }),
+                          ),
+                          SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: AppDimensions.sectionPadding.h,
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: CustomTitle(
+                              title: "Recommended For You",
+                            ),
+                          ),
+                          itemsSection(),
+                          if (controller.isLoadingProduct.value)
+                            SliverToBoxAdapter(
+                              child: Center(
+                                child: Image.asset(
+                                  AppImagePath.loadingAnimation,
+                                  height: 48.r,
+                                  width: 48.r,
+                                ),
+                              ),
+                            ),
+                          SliverToBoxAdapter(child: SizedBox(height: AppDimensions.sectionPadding.h,),),
+
                         ],
                       ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: CustomCheckBox(
-                        label: "Select All",
-                        padding: EdgeInsets.symmetric(
-                            vertical: AppDimensions.contentPadding.h),
-                        value: controller.selectAll.value,
-                        onChanged: (value) {
-                          controller.selectAll.value = value;
-                          if (value) {
-                            controller.selectedCartItems.value = [];
-                            controller.selectedCartItems
-                                .addAll(controller.cartModel.value.data ?? []);
-                            controller.changeListen();
-                          } else {
-                            controller.selectedCartItems.value = [];
-                            controller.changeListen();
-                          }
-                        },
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: AppDimensions.sectionPadding.h,
-                      ),
-                    ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                          childCount: controller.cartModel.value.data?.length ??
-                              0, (buildContext, index) {
-                        return Column(
-                          children: [
-                            SingleCartItem(
-                              index: index,
-                              //  value: controller.selectedCartItems.contains(1),
-                              cartItem:
-                              controller.cartModel.value.data?[index] ??
-                                  SingleCartModel(),
-                            ),
-                            if (index <
-                                (controller.cartModel.value.data?.length ?? 0) -
-                                    1)
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: AppDimensions.contentPadding.h),
-                                child: Divider(),
-                              )
-                          ],
-                        );
-                      }),
-                    ),
-                    SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: AppDimensions.sectionPadding.h,
-                      ),
-                    ),
-
-                    SliverToBoxAdapter(
-                      child: CustomTitle(
-                        title: "Add More Items from Timber Mart",
-                      ),
-                    ),
-                    itemsSection(),
-                    if (controller.isLoadingRecommended.value)
-                      const SliverFillRemaining(
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                  ],
-                ),
               ),
               if (controller.isLoading.value) const LoadingScreen()
             ],
@@ -162,21 +178,21 @@ class MyCartView extends GetView<MyCartController> {
   Widget itemsSection() {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate(
-          childCount: controller.recommendedProducts.length,
-              (buildContext, index) {
-            return SingleGridItem(
-             // index: index,
-              product: controller.recommendedProducts[index],
-              onTap: () {
-                Get.put(ProductDetailsController());
-                Get.find<ProductDetailsController>()
-                    .getDetails(id: controller.recommendedProducts[index].id ?? "");
-                /*    Get.find<ProductDetailsController>().categoryList.value =
+          childCount: controller.products.length,
+          (buildContext, index) {
+        return SingleGridItem(
+          // index: index,
+          product: controller.products[index],
+          onTap: () {
+            Get.put(ProductDetailsController());
+            Get.find<ProductDetailsController>()
+                .getDetails(id: controller.products[index].id ?? "");
+            /*    Get.find<ProductDetailsController>().categoryList.value =
                 controller.homeDataModel.value.categories ?? [];*/
-                Get.toNamed(Routes.PRODUCT_DETAILS);
-              },
-            );
-          }),
+            Get.toNamed(Routes.PRODUCT_DETAILS);
+          },
+        );
+      }),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 200,
           childAspectRatio: .7,

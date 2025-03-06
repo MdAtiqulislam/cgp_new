@@ -1,4 +1,5 @@
 
+import 'package:cgp/app/modules/shopDetails/models/products_by_branch_model.dart';
 import 'package:cgp/common_widgets/custom_circle_avatar.dart';
 import 'package:cgp/constraints/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,8 @@ class SingleWareHouse extends StatelessWidget {
             Get.find<ShopDetailsController>().branchType.value = warehouse.branchInfo?.branchType??"";
             Get.find<ShopDetailsController>().getWarehouseDetails();
             Get.find<ShopDetailsController>().getBranchDetails();
+            Get.find<ShopDetailsController>().productByWarehouseBranchModel.value=ProductByWarehouseBranchModel();
+            Get.find<ShopDetailsController>().products.value=[];
             Get.find<ShopDetailsController>().getProducts();
             Get.toNamed(Routes.SHOP_DETAILS);
           },

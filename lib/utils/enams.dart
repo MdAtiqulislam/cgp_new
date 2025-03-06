@@ -68,7 +68,65 @@ extension OrderStatusExtension on OrderStatus {
         return "pending";
     }
   }
+
+  static OrderStatus fromString(String status) {
+    switch (status) {
+      case 'waiting':
+        return OrderStatus.waiting;
+      case 'searching':
+        return OrderStatus.searching;
+      case 'accepted':
+        return OrderStatus.accepted;
+      case 'reached_at_pickup_point':
+        return OrderStatus.reachedAtPickupPoint;
+      case 'picked_up':
+        return OrderStatus.pickedUp;
+      case 'reached_at_delivery_point':
+        return OrderStatus.reachedAtDeliveryPoint;
+      case 'delivered':
+        return OrderStatus.delivered;
+      case 'expired':
+        return OrderStatus.expired;
+      case 'cancelled':
+        return OrderStatus.cancelled;
+      case 'pending':
+        return OrderStatus.pending;
+      default:
+        throw ArgumentError('Invalid status: $status');
+    }
+  }
 }
+
+String getFormattedStatus(String status) {
+  OrderStatus orderStatus = OrderStatusExtension.fromString(status);
+
+  switch (orderStatus) {
+    case OrderStatus.waiting:
+      return 'Waiting for action';
+    case OrderStatus.searching:
+      return 'Searching for a driver';
+    case OrderStatus.accepted:
+      return "Order Accepted";
+    case OrderStatus.reachedAtPickupPoint:
+      return "Reached at Pickup Point";
+    case OrderStatus.pickedUp:
+      return "Picked Up";
+    case OrderStatus.reachedAtDeliveryPoint:
+      return "Reached At Delivery Point";
+    case OrderStatus.delivered:
+      return "Delivered";
+    case OrderStatus.expired:
+      return "Order Expired";
+    case OrderStatus.cancelled:
+      return "Order Cancelled";
+    case OrderStatus.pending:
+      return "Order Pending";
+    default:
+      return "Unknown Status";
+  }
+}
+
+
 
 
 enum BranchType {

@@ -96,7 +96,7 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
       return;
     } else {}
 
-    socket = IO.io('https://cgp-rider-api.onrender.com', <String, dynamic>{
+    socket = IO.io(APIEndPoints.baseUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
     });

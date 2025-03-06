@@ -1,4 +1,3 @@
-import 'package:cgp/app/modules/home/models/home_data_model.dart';
 import 'package:cgp/app/modules/wishList/views/single_wish_list_product.dart';
 import 'package:cgp/common_widgets/cart_page_header.dart';
 import 'package:cgp/common_widgets/custom_app_bar.dart';
@@ -41,6 +40,7 @@ class WishListView extends GetView<WishListController> {
                   horizontal: AppDimensions.horizontalPadding.w,
                 ),
                 child: CustomScrollView(
+                  controller: controller.scrollController,
                   slivers: [
                     const SliverToBoxAdapter(
                       child: CartPageHeader(
@@ -152,12 +152,17 @@ class WishListView extends GetView<WishListController> {
                       ),
                     ),
                     itemsSection(),
-                    if (controller.isLoadingRecommended.value)
-                      const SliverFillRemaining(
+                    if (controller.isLoadingProduct.value)
+                      SliverToBoxAdapter(
                         child: Center(
-                          child: CircularProgressIndicator(),
+                          child: Image.asset(
+                            AppImagePath.loadingAnimation,
+                            height: 48.r,
+                            width: 48.r,
+                          ),
                         ),
-                      )
+                      ),
+                    SliverToBoxAdapter(child: SizedBox(height: AppDimensions.sectionPadding.h,),),
                   ],
                 ),
               ),
@@ -172,15 +177,15 @@ class WishListView extends GetView<WishListController> {
   Widget itemsSection() {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate(
-          childCount: controller.recommendedProducts.length,
+          childCount: controller.products.length,
           (buildContext, index) {
         return SingleGridItem(
        //   index: index,
-          product: controller.recommendedProducts[index],
+          product: controller.products[index],
           onTap: () {
             Get.put(ProductDetailsController());
             Get.find<ProductDetailsController>()
-                .getDetails(id: controller.recommendedProducts[index].id ?? "");
+                .getDetails(id: controller.products[index].id ?? "");
             /*    Get.find<ProductDetailsController>().categoryList.value =
                 controller.homeDataModel.value.categories ?? [];*/
             Get.toNamed(Routes.PRODUCT_DETAILS);

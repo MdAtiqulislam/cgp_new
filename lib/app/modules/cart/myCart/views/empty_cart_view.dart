@@ -37,7 +37,7 @@ class EmptyCartView extends GetView<MyCartController> {
           ),
         ),
         itemsSection(),
-        if (controller.isLoadingRecommended.value)
+        if (controller.isLoadingProduct.value)
           const SliverFillRemaining(
             child: Center(
               child: CircularProgressIndicator(),
@@ -49,15 +49,15 @@ class EmptyCartView extends GetView<MyCartController> {
   Widget itemsSection() {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate(
-          childCount: controller.recommendedProducts.length,
+          childCount: controller.products.length,
               (buildContext, index) {
             return SingleGridItem(
              // index: index,
-              product: controller.recommendedProducts[index],
+              product: controller.products[index],
               onTap: () {
                 Get.put(ProductDetailsController());
                 Get.find<ProductDetailsController>()
-                    .getDetails(id: controller.recommendedProducts[index].id ?? "");
+                    .getDetails(id: controller.products[index].id ?? "");
                 /*    Get.find<ProductDetailsController>().categoryList.value =
                 controller.homeDataModel.value.categories ?? [];*/
                 Get.toNamed(Routes.PRODUCT_DETAILS);

@@ -6,6 +6,7 @@ import 'package:cgp/services/api_endpoints.dart';
 import 'package:cgp/services/local_services.dart';
 import 'package:cgp/services/pusher_services.dart';
 import 'package:cgp/services/remote_services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,12 +22,14 @@ import 'package:path_provider/path_provider.dart';
 class SplashScreenController extends GetxController {
   var isLoading = true.obs;
   var appVersionModel = AppVersionModel().obs;
+  var token="".obs;
 
   NotificationServices notificationServices = NotificationServices();
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
+    token.value=await LocalServices.getToken()??"";
     notificationServices.setupInterruptMessage(Get.context!);
     //  getLoginStatus();
     getAppVersion();
@@ -41,21 +44,25 @@ class SplashScreenController extends GetxController {
 
   Future<void> getLoginStatus() async {
     final token = await LocalServices.getToken();
-    isLoading.value =
-        false; // Set isLoading to false regardless of token presence
+   // // Set isLoading to false regardless of token presence
     if (token != null) {
       //Get.offAllNamed(Routes.HOME); // Navigate to HOME if token exists
       await LocalServices.getUser().then((value) {
         Get.put(PusherService(value!.userId.toString()));
       });
       Get.offAndToNamed(Routes.TRANSPORTATION);
+      isLoading.value=false;
+    }else{
+      isLoading.value=false;
     }
   }
 
   Future<void> getAppVersion() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     var currentAppVersion = packageInfo.version;
-    print("currentAppVersion:$currentAppVersion");
+    if (kDebugMode) {
+      print("currentAppVersion:$currentAppVersion");
+    }
     var endPoint = APIEndPoints.appVersionEndpoint;
     try {
       var response =
@@ -63,22 +70,31 @@ class SplashScreenController extends GetxController {
       if (response != null) {
         appVersionModel.value = AppVersionModel.fromJson(response);
         checkAppVersion(currentAppVersion);
-        print("Ios test version: ${appVersionModel.value.iosTestVersion}");
       }
     } finally {}
   }
 
   void checkAppVersion(String currentAppVersion) {
+    print(currentAppVersion);
     if (Platform.isIOS) {
+      if (kDebugMode) {
+        print("Ios test version: ${appVersionModel.value.iosTestVersion}");
+      }
       if (currentAppVersion == appVersionModel.value.iosVersion ||
-          currentAppVersion == (appVersionModel.value.iosTestVersion??"1.0.6")) {
+          currentAppVersion == (appVersionModel.value.iosTestVersion??"1.0.7")||
+          appVersionModel.value.iosTestVersion=="1.0.8"//this should be removed
+      ) {
         getLoginStatus();
       }else{
         showForceUpdateDialog();
       }
     } else if (Platform.isAndroid) {
+      if (kDebugMode) {
+        print("Android test version: ${appVersionModel.value.androidTestVersion}");
+        print("Android  version: ${appVersionModel.value.androidVersion}");
+      }
       if (currentAppVersion == (appVersionModel.value.androidVersion??"1.0.2") ||
-          currentAppVersion == (appVersionModel.value.androidTestVersion??"1.0.2")) {
+          currentAppVersion == (appVersionModel.value.androidTestVersion??"1.0.4")) {
         getLoginStatus();
       }else{
         showForceUpdateDialog();

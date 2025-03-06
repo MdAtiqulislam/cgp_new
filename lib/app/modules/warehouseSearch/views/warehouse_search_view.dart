@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../common_widgets/custom_app_bar.dart';
-import '../../../../common_widgets/custom_loading_screen.dart';
 import '../../../../common_widgets/custom_search_bar.dart';
 import '../../../../common_widgets/my_drawer.dart';
 import '../../../../constraints/app_colors.dart';
@@ -42,6 +41,7 @@ class WarehouseSearchView extends GetView<WarehouseSearchController> {
                 padding: EdgeInsets.symmetric(
                     horizontal: AppDimensions.horizontalPadding.w),
                 child: CustomScrollView(
+                  controller: controller.scrollController,
                   slivers: [
                     SliverToBoxAdapter(
                       child: SizedBox(
@@ -70,7 +70,7 @@ class WarehouseSearchView extends GetView<WarehouseSearchController> {
                         children: [
                           BodyText(
                             text:
-                                "${controller.searchKey.value} (${controller.searchWarehouses.length} Results)",
+                                "${controller.searchKey.value} (${controller.warehouseSearchModel.value.total??0} Results)",
                             color: AppColors.primaryColor,
                             fontWeight: FontWeight.w500,
                           ),
@@ -88,13 +88,28 @@ class WarehouseSearchView extends GetView<WarehouseSearchController> {
                           return _buildSearchItem(
                               controller.searchWarehouses[index]);
                         },
-                        childCount: controller.searchWarehouses.length,
+                        childCount: controller.searchWarehouses.value.length,
                       ),
                     ),
+                    if (controller.isLoading.value)
+                      SliverToBoxAdapter(
+                        child: Center(
+                          child: Image.asset(
+                            AppImagePath.loadingAnimation,
+                            height: 48.r,
+                            width: 48.r,
+                          ),
+                        ),
+                      ),
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: AppDimensions.sectionPadding.h,
+                      ),
+                    )
                   ],
                 ),
               ),
-              if (controller.isLoading.value) const LoadingScreen(),
+         //     if (controller.isLoading.value) const LoadingScreen(),
             ],
           ),
         ),
@@ -102,7 +117,7 @@ class WarehouseSearchView extends GetView<WarehouseSearchController> {
     );
   }
 
-  Widget _buildSearchItem(WarehouseSearchData searchWarehouse) {
+  Widget _buildSearchItem(SearchWarehouseModel searchWarehouse) {
     return Container(
       clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.only(bottom: AppDimensions.widgetPadding.h),

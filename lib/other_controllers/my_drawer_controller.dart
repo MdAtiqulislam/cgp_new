@@ -1,5 +1,6 @@
 import 'package:cgp/app/modules/orderHistory/controllers/order_history_controller.dart';
 import 'package:cgp/app/modules/orderHistory/models/order_history_model.dart';
+import 'package:cgp/app/modules/splashScreen/controllers/splash_screen_controller.dart';
 import 'package:cgp/common_widgets/custom_snackbar.dart';
 import 'package:cgp/models/customer_model.dart';
 import 'package:cgp/models/logged_in_customer_profile_model.dart';
@@ -121,6 +122,8 @@ class MyDrawerController extends GetxController {
         ).showSnackBar();
       }
     } finally {
+      Get.put(SplashScreenController()).token.value="";
+      Get.put(SplashScreenController()).isLoading.value=false;
       Get.offAllNamed(Routes.SPLASH_SCREEN);
       Get.find<FloatingController>().hideFloating();
       LocalServices.deleteData();

@@ -4,9 +4,12 @@ import 'package:get/get.dart';
 class AppStrings {
   static final httpErrorMSG = "".obs;
   static const generalHttpErrorMSG = "An unexpected error occurred while processing your request. Please try again later.";
-  static const publishableKey = "pk_test_51PE2ezGJkp9au0iQVGK9hvtYTmitSBZd8FzSEvWpZvoHkiYUIlblCdkiF5C8CSj5rtfAXYKX04XuEqWh98iEfxEw00wrgKUR21";
+  static const publishableKey = "pk_live_51PE2ezGJkp9au0iQwvagdLlXDoBNNGVPPHGnZQtw1bFTolfHlLBohNBBjSEFMVi791ahXUzpUZpXMht66DKVkbxp008HVjxtsG";
+  static const paginationProductsPerPage="20";
+  static const paginationWarehousesPerPage="20";
+  static const paginationSearchWarehousePerPage="20";
+  static const paginationCategoryWarehousePerPage="20";
  }
-
 class AppImagePath {
   static const appLogo="assets/logo/logo.png";
   static const avatar="assets/icons/avatar.png";
@@ -58,10 +61,8 @@ class AppImagePath {
 
   static const warehouse="assets/icons/warehouse.png";
   static const noImage="assets/images/no_image.png";
-
-  //static const infoIcon="assets/icons/info_icon.png";
-
-  //static const mapIcon="assets/icons/map_icon.png";
+  static const loadingAnimation="assets/loading.gif";
+  static const errorImage="assets/images/error_image.png";
 }
 
 class AppTitlesAndKeys {

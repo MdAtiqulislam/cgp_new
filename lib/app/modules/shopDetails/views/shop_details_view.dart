@@ -1,7 +1,6 @@
 import 'package:cgp/app/modules/shopDetails/views/shop_details_section.dart';
 import 'package:cgp/common_widgets/custom_app_bar.dart';
 import 'package:cgp/common_widgets/custom_circle_avatar.dart';
-import 'package:cgp/common_widgets/custom_image_slider.dart';
 import 'package:cgp/common_widgets/custom_network_image.dart';
 import 'package:cgp/common_widgets/custom_text_field.dart';
 import 'package:cgp/common_widgets/custom_title.dart';
@@ -46,7 +45,10 @@ class ShopDetailsView extends GetView<ShopDetailsController> {
           () => Padding(
             padding: EdgeInsets.symmetric(
                 horizontal: AppDimensions.horizontalPadding.w),
-            child: CustomScrollView(
+            child:controller.isLoading.value
+                ? LoadingScreen(showAnimation: controller.showLoadingAnimation.value,)
+                : CustomScrollView(
+              controller: controller.scrollController,
               slivers: [
                 SliverToBoxAdapter(
                   child: SizedBox(
@@ -128,13 +130,18 @@ class ShopDetailsView extends GetView<ShopDetailsController> {
                     height: AppDimensions.contentPadding.h,
                   ),
                 ),
+                itemsSection(),
                 if (controller.isLoadingProduct.value)
-                  const SliverFillRemaining(
+                  SliverToBoxAdapter(
                     child: Center(
-                      child: CircularProgressIndicator(),
+                      child: Image.asset(
+                        AppImagePath.loadingAnimation,
+                        height: 48.r,
+                        width: 48.r,
+                      ),
                     ),
                   ),
-                if (!controller.isLoadingProduct.value) itemsSection(),
+               // SliverToBoxAdapter(child: SizedBox(height: AppDimensions.sectionPadding.h,),),
                 SliverToBoxAdapter(
                   child: SizedBox(
                     height: AppDimensions.sectionPadding.h,
@@ -152,24 +159,23 @@ class ShopDetailsView extends GetView<ShopDetailsController> {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate(
           childCount:
-              controller.products.value.data?.products?.length ?? 0,
+              controller.products.length,
           (buildContext, index) {
         return SingleGridItem(
            // index: index,
             product:
-                controller.products.value.data?.products?[index],
+                controller.products[index],
             onTap: () {
               Get.put(ProductDetailsController());
               Get.find<ProductDetailsController>().getDetails(
-                  id: controller.products.value.data
-                          ?.products?[index].id ??
+                  id: controller.products[index].id ??
                       "");
               Get.toNamed(Routes.PRODUCT_DETAILS);
             });
       }),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 200,
-          childAspectRatio: .6,
+          childAspectRatio: .56,
           crossAxisSpacing: AppDimensions.contentPadding.w,
           mainAxisSpacing: AppDimensions.contentPadding.h),
     );
