@@ -230,7 +230,8 @@ class MyDrawer extends StatelessWidget {
       {required VoidCallback onTap,
         required String imageIcon,
         Widget? icon,
-        required String text}) {
+        required String text})
+  {
     return Container(
       margin: EdgeInsets.symmetric(vertical: AppDimensions.contentPadding.h),
       clipBehavior: Clip.hardEdge,

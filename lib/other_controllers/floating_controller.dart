@@ -13,7 +13,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../app/modules/messaging/controllers/messaging_controller.dart';
 import '../app/modules/orderDetails/models/cancel_reasons_model.dart';
 import '../app/routes/app_pages.dart';
@@ -50,7 +49,9 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
     super.onInit();
     WidgetsBinding.instance.addObserver(this);
     await LocalServices.getOnGoingTrip().then((value) {
-      if (value != null) {
+      if (value != null&& value.isNotEmpty) {
+        print("value....: $value");
+
         orderId.value = value;
         showFloating();
       }
@@ -90,13 +91,20 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
   }
 
   void initializeSocket() {
-    print("Initializing socket...");
+    if (kDebugMode) {
+      print("Initializing socket...");
+    }
     if (socket != null) {
-      print("Socket already initialized");
+      if (kDebugMode) {
+        print("Socket already initialized");
+      }
       return;
     } else {}
 
-    socket = IO.io(APIEndPoints.baseUrl, <String, dynamic>{
+    var socketUrl="https://rider-api.tradebar.com.au";
+
+
+    socket = IO.io(socketUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
     });
@@ -139,10 +147,14 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
     });
 
    // socket?.on('locationUpdated', (data) {
-    print('riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider?.id}');
+    if (kDebugMode) {
+      print('riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider?.id}');
+    }
 
     socket?.on('riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider?.id}', (data) {
-      print('riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider?.id}');
+      if (kDebugMode) {
+        print('riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider?.id}');
+      }
 
 
       riderLocation = LatLng(
@@ -172,7 +184,9 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
   }
 
   void disconnectSocket() {
-    print("Disconnecting socket...");
+    if (kDebugMode) {
+      print("Disconnecting socket...");
+    }
     if (socket != null) {
       socket?.disconnect();
       socket?.off('connect');

@@ -45,7 +45,8 @@ class TrackOrderController extends GetxController {
   }
 
   void initializeSocket() {
-    socket = IO.io('https://cgp-rider-api.onrender.com', <String, dynamic>{
+    //socket = IO.io('https://cgp-rider-api.onrender.com', <String, dynamic>{
+    socket = IO.io('https://customer-api.tradebar.com.au', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
     });
