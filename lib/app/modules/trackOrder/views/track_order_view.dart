@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -96,7 +97,7 @@ class TrackOrderView extends GetView<TrackOrderController> {
                               initialCameraPosition:
                               controller.initialCameraPosition,
                               polylines: controller.polyLines.value,
-                              markers: controller.markers.toSet(), // Ensure markers are updated
+                              markers: controller.markers,//.toSet(), // Ensure markers are updated
                             ),
                           ),
                         ),
@@ -163,7 +164,8 @@ class TrackOrderView extends GetView<TrackOrderController> {
               color: AppColors.primaryColor,
               size: 12,
             ),
-            /*Container(
+            */
+/*Container(
               padding: EdgeInsets.symmetric(
                 horizontal: AppDimensions.widgetPadding.w,
               ),
@@ -177,7 +179,8 @@ class TrackOrderView extends GetView<TrackOrderController> {
                 size: 12,
                 color: Colors.white,
               ),
-            ),*/
+            ),*//*
+
           ],
         ),
       ],
@@ -205,6 +208,76 @@ class TrackOrderView extends GetView<TrackOrderController> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+*/
+
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../../../../constraints/app_colors.dart';
+import '../../../../constraints/dimensions.dart';
+import '../../../../constraints/header_text.dart';
+import '../../../../common_widgets/custom_app_bar.dart';
+import '../controllers/track_order_controller.dart';
+
+class TrackOrderView extends GetView<TrackOrderController> {
+  TrackOrderView({super.key});
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: CustomAppBar(minimal: false, scaffoldKey: _scaffoldKey),
+        body: Stack(
+          children: [
+            Obx(
+                  () => GoogleMap(
+                onMapCreated: controller.onMapCreated,
+                initialCameraPosition: controller.initialCameraPosition,
+                mapType: MapType.normal,
+                markers: controller.markers,
+                polylines: controller.polyLines.value,
+                myLocationEnabled: false,
+                onCameraMoveStarted: () {
+                  controller.autoFollowRider.value = false;
+                },
+              ),
+            ),
+            Positioned(
+              bottom: 20.h,
+              left: 20.w,
+              right: 20.w,
+              child: ElevatedButton(
+                onPressed: () {
+                  controller.autoFollowRider.value = true;
+                  if (controller.markers.isNotEmpty) {
+                    final rider = controller.markers
+                        .firstWhere((m) => m.markerId.value == 'rider');
+                    controller.setCameraPosition(target: rider.position, zoom: 16);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+                child: const HeaderText(
+                  text: "Follow Rider",
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

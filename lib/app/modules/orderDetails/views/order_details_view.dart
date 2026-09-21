@@ -648,9 +648,8 @@ class OrderDetailsView extends GetView<OrderDetailsController> {
           Get.find<TrackOrderController>().generateRoute(
               origin: origin,
               destination: destination,
-              currentLocation: currentLocation);
-          Get.find<TrackOrderController>()
-              .setCameraPosition(target: destination);
+              riderLocation: currentLocation);
+         // Get.find<TrackOrderController>().setCameraPosition(target: destination);
           await Get.toNamed(Routes.TRACK_ORDER)?.then((value) {
             controller.getOrderDetails(
                 orderId:

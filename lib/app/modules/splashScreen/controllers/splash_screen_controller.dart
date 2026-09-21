@@ -1,206 +1,176 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
+
 import 'package:cgp/app/modules/splashScreen/models/appversion_model.dart';
 import 'package:cgp/app/routes/app_pages.dart';
-import 'package:cgp/constraints/dimensions.dart';
 import 'package:cgp/services/api_endpoints.dart';
 import 'package:cgp/services/local_services.dart';
 import 'package:cgp/services/pusher_services.dart';
 import 'package:cgp/services/remote_services.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../constraints/app_colors.dart';
 import '../../../../constraints/body_text.dart';
 import '../../../../constraints/header_text.dart';
+import '../../../../constraints/dimensions.dart';
 import '../../../../services/notification_services.dart';
-import 'package:path_provider/path_provider.dart';
 
 class SplashScreenController extends GetxController {
   var isLoading = true.obs;
   var appVersionModel = AppVersionModel().obs;
-  var token="".obs;
+  var token = "".obs;
 
-  NotificationServices notificationServices = NotificationServices();
+  final NotificationServices notificationServices = NotificationServices();
 
   @override
   Future<void> onInit() async {
     super.onInit();
-    token.value=await LocalServices.getToken()??"";
-    notificationServices.setupInterruptMessage(Get.context!);
-    //  getLoginStatus();
+    token.value = await LocalServices.getToken() ?? "";
     getAppVersion();
   }
+
   @override
   void onReady() {
     super.onReady();
+    // ✅ Context safe
+    if (Get.context != null) {
+      notificationServices.setupInterruptMessage(Get.context!);
+    }
   }
 
-  @override
-  void onClose() {}
+  // ================= LOGIN CHECK =================
 
   Future<void> getLoginStatus() async {
     final token = await LocalServices.getToken();
-   // // Set isLoading to false regardless of token presence
-    if (token != null) {
-      //Get.offAllNamed(Routes.HOME); // Navigate to HOME if token exists
-      await LocalServices.getUser().then((value) {
-        Get.put(PusherService(value!.userId.toString()));
-      });
-      Get.offAndToNamed(Routes.TRANSPORTATION);
-      isLoading.value=false;
-    }else{
-      isLoading.value=false;
+
+    if (token != null && token.isNotEmpty) {
+      final user = await LocalServices.getUser();
+
+      if (user != null) {
+        Get.put(PusherService(user.userId.toString()));
+      }
+
+      isLoading.value = false;
+      Get.offAllNamed(Routes.TRANSPORTATION);
+    } else {
+      isLoading.value = false;
+      Get.offAllNamed(Routes.LOGIN);
     }
   }
 
+  // ================= VERSION CHECK =================
+
   Future<void> getAppVersion() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    var currentAppVersion = packageInfo.version;
-    if (kDebugMode) {
-      print("currentAppVersion:$currentAppVersion");
-    }
-    var endPoint = APIEndPoints.appVersionEndpoint;
     try {
-      var response =
-          await RemoteServices.getRequestForResponseBody(endPoint: endPoint);
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      var currentAppVersion = packageInfo.version;
+
+      if (kDebugMode) {
+        print("Current Version: $currentAppVersion");
+      }
+
+      var response = await RemoteServices.getRequestForResponseBody(
+        endPoint: APIEndPoints.appVersionEndpoint,
+      );
+
       if (response != null) {
         appVersionModel.value = AppVersionModel.fromJson(response);
         checkAppVersion(currentAppVersion);
+      } else {
+        getLoginStatus();
       }
-    } finally {}
+    } catch (e) {
+      debugPrint("Version check error: $e");
+      getLoginStatus();
+    }
   }
 
-  void checkAppVersion(String currentAppVersion) {
-    print(currentAppVersion);
+  void checkAppVersion(String currentVersion) {
     if (Platform.isIOS) {
-      if (kDebugMode) {
-        print("Ios test version: ${appVersionModel.value.iosTestVersion}");
-      }
-      if (currentAppVersion == appVersionModel.value.iosVersion ||
-          currentAppVersion == (appVersionModel.value.iosTestVersion??"1.0.7")||
-          appVersionModel.value.iosTestVersion=="1.0.8"//this should be removed
-      ) {
+      if (currentVersion == appVersionModel.value.iosVersion ||
+          currentVersion == appVersionModel.value.iosTestVersion) {
         getLoginStatus();
-      }else{
+      } else {
         showForceUpdateDialog();
       }
-    } else if (Platform.isAndroid) {
-      if (kDebugMode) {
-        print("Android test version: ${appVersionModel.value.androidTestVersion}");
-        print("Android  version: ${appVersionModel.value.androidVersion}");
-      }
-      if (currentAppVersion == (appVersionModel.value.androidVersion??"1.0.2") ||
-          currentAppVersion == (appVersionModel.value.androidTestVersion??"1.0.4")) {
+    } else {
+      if (currentVersion == appVersionModel.value.androidVersion ||
+          currentVersion == appVersionModel.value.androidTestVersion) {
         getLoginStatus();
-      }else{
+      } else {
         showForceUpdateDialog();
       }
     }
   }
 
+  // ================= FORCE UPDATE =================
+
   void showForceUpdateDialog() {
-    _deleteCacheDir();
     showDialog(
       context: Get.context!,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (context) {
         return WillPopScope(
           onWillPop: () async => false,
           child: AlertDialog(
-            actionsAlignment: MainAxisAlignment.center,
-            titlePadding: const EdgeInsets.all(0),
-            title: Container(
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor,
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(AppDimensions.borderRadius.r),topRight: Radius.circular(AppDimensions.borderRadius.r))
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0.h,horizontal: AppDimensions.horizontalPadding.w),
-                child: HeaderText(
-                  text: appVersionModel.value.majorMsg?.title ?? "",
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
+            title: HeaderText(
+              text: appVersionModel.value.majorMsg?.title ?? "Update Required",
+              size: 18,
+              color: AppColors.primaryColor,
             ),
             content: BodyText(
-              text: appVersionModel.value.majorMsg?.msg ?? "",
-              maxLine: 10,
+              text: appVersionModel.value.majorMsg?.msg ??
+                  "Please update the app to continue.",
+              maxLine: 5,
               size: 14,
             ),
-            actions: <Widget>[
+            actions: [
               MaterialButton(
-                autofocus: true,
-                textColor: Colors.white,
                 color: AppColors.primaryColor,
-                focusColor: AppColors.primaryColor,
-                splashColor: AppColors.primaryColor,
-                focusElevation: 5,
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(color: AppColors.primaryColor),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                // color: AppColors.mainColorRed,
-                onPressed: () {
+                textColor: Colors.white,
+                onPressed: () async {
                   if (Platform.isAndroid) {
-                    final appId = appVersionModel.value.majorMsg!.url!.apk!
-                        .split("id")[1];
-                    final url = Uri.parse("market://details?id$appId");
-                    launchUrl(
-                      url,
-                      mode: LaunchMode.externalApplication,
-                    );
-                  }
-                  else  if (Platform.isIOS) {
                     final url = Uri.parse(
-                        appVersionModel.value.majorMsg!.url!.ios.toString());
-                    launchUrl(
-                      url,
-                      mode: LaunchMode.externalApplication,
-                    );
+                        appVersionModel.value.majorMsg?.url?.apk ?? "");
+                    await launchUrl(url,
+                        mode: LaunchMode.externalApplication);
+                  } else {
+                    final url = Uri.parse(
+                        appVersionModel.value.majorMsg?.url?.ios ?? "");
+                    await launchUrl(url,
+                        mode: LaunchMode.externalApplication);
                   }
                 },
-                child: const Text(
-                  "Update",
-                ),
+                child: const Text("Update"),
               ),
               MaterialButton(
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: AppColors.primaryColor),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  textColor: AppColors.primaryColor,
-                  splashColor: AppColors.primaryColor,
-                  onPressed: () {
-                    SystemNavigator.pop();
-                  },
-                  child: const Text("Cancel"))
+                textColor: AppColors.primaryColor,
+                onPressed: () {
+                  SystemNavigator.pop();
+                },
+                child: const Text("Exit"),
+              ),
             ],
           ),
         );
       },
     );
-
   }
 
-  Future<void> _deleteCacheDir() async {
-    isLoading.value = true;
+  // ================= SAFE CACHE CLEAR (OPTIONAL) =================
+
+/*  Future<void> clearTemporaryCache() async {
     try {
       final cacheDir = await getTemporaryDirectory();
       if (cacheDir.existsSync()) {
-        cacheDir.deleteSync(recursive: true);
+        await cacheDir.delete(recursive: true);
       }
-      final appDir = await getApplicationSupportDirectory();
-      if (appDir.existsSync()) {
-        appDir.deleteSync(recursive: true);
-         }
-    } finally {
-      isLoading.value = false;
-      LocalServices.deleteData();
+    } catch (e) {
+      debugPrint("Temp cache delete error: $e");
     }
-  }
+  }*/
 }

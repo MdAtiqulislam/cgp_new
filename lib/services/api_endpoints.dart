@@ -3,6 +3,7 @@ class APIEndPoints {
   //static const baseUrl = "https://raw-bertie-wittyplex.koyeb.app";
   //static const baseUrl = "https://cgp-customer-api-dev.onrender.com";
   static const baseUrl = "https://customer-api.tradebar.com.au";
+  static const socketUrl="https://rider-api.tradebar.com.au";
   static const baseUrlMessaging = "https://laravel-api.tradebar.com.au";
 
 
@@ -68,5 +69,12 @@ class APIEndPoints {
   static const appVersionEndpoint="/app/version";
   static const removeAccount="/customers/remove-account";
   static const loggedInCustomerProfile="/customers/profile";
+
+  static var deleteNotificationById="/notifications/{notificationId}";
+
+  static var markAllAsReadNotification="/notifications/mark-all-as-read";
+
+  static const deleteAllNotifications="/notifications/delete-all";
+
 
 }

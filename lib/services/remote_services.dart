@@ -494,16 +494,17 @@ class RemoteServices {
 
   static dynamic handleResponse(http.Response response) {
     if (isHttpStatusSuccess(response.statusCode)) {
-      var responseData=json.decode(response.body);
-      if(responseData["status"]=="success"){
-        return json.decode(response.body);
-      }else{
-        AppStrings.httpErrorMSG.value = responseData.toString().contains("msg")
-            ? responseData["msg"]
-            : AppStrings.generalHttpErrorMSG;
+      var responseData = json.decode(response.body);
+
+      if (responseData["status"] == "success") {
+        return responseData;
+      } else {
+        AppStrings.httpErrorMSG.value =
+            responseData["msg"] ??
+                responseData["message"] ??
+                AppStrings.generalHttpErrorMSG;
         return null;
       }
-     // return json.decode(response.body);
     } else {
       if (kDebugMode) {
         print(generateHttpErrorMessage(response.statusCode));
@@ -511,14 +512,15 @@ class RemoteServices {
 
       try {
         final dynamic responseData = json.decode(response.body);
-        AppStrings.httpErrorMSG.value = responseData.toString().contains("msg")
-            ? responseData["msg"]
-            :responseData.toString().contains("message")
-            ?responseData["message"]
-            : AppStrings.generalHttpErrorMSG;
-      } on Exception {
+
+        AppStrings.httpErrorMSG.value =
+            responseData["msg"] ??
+                responseData["message"] ??
+                AppStrings.generalHttpErrorMSG;
+      } catch (e) {
         AppStrings.httpErrorMSG.value = AppStrings.generalHttpErrorMSG;
       }
+
       return null;
     }
   }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:cgp/app/modules/orderDetails/controllers/order_details_controller.dart';
 import 'package:cgp/app/modules/orderDetails/models/order_details_model.dart';
@@ -15,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app/modules/messaging/controllers/messaging_controller.dart';
 import '../app/modules/orderDetails/models/cancel_reasons_model.dart';
+import '../app/modules/trackOrder/controllers/track_order_controller.dart';
 import '../app/routes/app_pages.dart';
 import '../common_widgets/custom_snackbar.dart';
 import '../constraints/app_strings.dart';
@@ -39,7 +39,7 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
   var destinationName = "".obs;
   var orderId = "".obs;
 
-  var activeProgress=0.obs;
+  var activeProgress = 0.obs;
 
   var cancelReasonsModel = CancelReasonsModel().obs;
   var selectedCancelReason = CancelReasonModel().obs;
@@ -49,7 +49,7 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
     super.onInit();
     WidgetsBinding.instance.addObserver(this);
     await LocalServices.getOnGoingTrip().then((value) {
-      if (value != null&& value.isNotEmpty) {
+      if (value != null && value.isNotEmpty) {
         print("value....: $value");
 
         orderId.value = value;
@@ -101,10 +101,7 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
       return;
     } else {}
 
-    var socketUrl="https://rider-api.tradebar.com.au";
-
-
-    socket = IO.io(socketUrl, <String, dynamic>{
+    socket = IO.io(APIEndPoints.socketUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
     });
@@ -146,41 +143,49 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
       }
     });
 
-   // socket?.on('locationUpdated', (data) {
+    // socket?.on('locationUpdated', (data) {
     if (kDebugMode) {
-      print('riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider?.id}');
+      print(
+          'riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider
+              ?.id}');
     }
 
-    socket?.on('riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider?.id}', (data) {
-      if (kDebugMode) {
-        print('riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider?.id}');
-      }
+    socket?.on(
+        'riderLocationUpdated_${orderDetails.value.data?.deliveryInfo?.rider
+            ?.id}',
+            (data) {
+          if (kDebugMode) {
+            print(
+                'riderLocationUpdated_${orderDetails.value.data?.deliveryInfo
+                    ?.rider?.id}');
+          }
 
+          riderLocation = LatLng(
+            data['location']['coordinates'][1], // Latitude
+            data['location']['coordinates'][0], // Longitude
+          );
+          if (kDebugMode) {
+            print("Rider location: $riderLocation");
+          }
+          handleStatus();
+        });
 
-      riderLocation = LatLng(
-        data['location']['coordinates'][1], // Latitude
-        data['location']['coordinates'][0], // Longitude
-      );
-      if (kDebugMode) {
-        print("Rider location: $riderLocation");
-      }
-      handleStatus();
-    });
-
-    socket?.on('orderStatusUpdated_${orderDetails.value.data?.orderId}', (data) {
-      if (kDebugMode) {
-        print("orderStatusUpdate_Data:$data");
-
-
-      }
-      if (data != null) {
-        ongoingOrder.value = OngoingOrderData.fromJson(data);
-        handleStatus();
-        Get.put(OrderDetailsController());
-        Get.find<OrderDetailsController>().orderStatus.value =
-            ongoingOrder.value.shippingStatus ?? "";
-      }
-    });
+    socket?.on('orderStatusUpdated_${orderDetails.value.data?.orderId}',
+            (data) {
+          if (kDebugMode) {
+            print("orderStatusUpdate_Data:$data");
+          }
+          if (data != null) {
+            ongoingOrder.value = OngoingOrderData.fromJson(data);
+            handleStatus();
+            Get.put(OrderDetailsController());
+            Get
+                .find<OrderDetailsController>()
+                .orderStatus
+                .value =
+                ongoingOrder.value.shippingStatus ?? "";
+          }
+        });
   }
 
   void disconnectSocket() {
@@ -206,30 +211,33 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
     String currentStatus = ongoingOrder.value.shippingStatus ?? "";
     if (currentStatus == OrderStatus.accepted.name ||
         currentStatus == OrderStatus.reachedAtPickupPoint.name) {
-     if(orderDetails.value.data?.deliveryInfo?.rider?.location==null){
-       await getOrderDetails().then((value){
-         handleStatus();
-       });
-     }
-       else{
-       destinationName.value = "Pickup Point";
-       riderLocation = LatLng(
-           orderDetails.value.data?.deliveryInfo?.rider?.location?.latitude ?? 0.0,
-           orderDetails.value.data?.deliveryInfo?.rider?.location?.longitude ?? 0.0);
-       destination = LatLng(
-           orderDetails.value.data?.pickupAddress?.latitude ?? 0.0,
-           orderDetails.value.data?.pickupAddress?.longitude ?? 0.0);
-       if (ongoingOrder.value.duration!=null && ongoingOrder.value.distance!=null) {
-        distanceInMeter=double.parse(ongoingOrder.value.distance??"0.0");
-        timeInSeconds=double.parse(ongoingOrder.value.duration??"0.0");
-       }else{
-         distanceInMeter = calculateDistanceInMeter(riderLocation, destination);
-         if (kDebugMode) {
-           print("distanceInMeter:$distanceInMeter");
-         }
-         timeInSeconds = (90.0 / 1000.0) * distanceInMeter;
-       }
-     }
+      if (orderDetails.value.data?.deliveryInfo?.rider?.location == null) {
+        await getOrderDetails().then((value) {
+          handleStatus();
+        });
+      } else {
+        destinationName.value = "Pickup Point";
+        riderLocation = LatLng(
+            orderDetails.value.data?.deliveryInfo?.rider?.location?.latitude ??
+                0.0,
+            orderDetails.value.data?.deliveryInfo?.rider?.location?.longitude ??
+                0.0);
+        destination = LatLng(
+            orderDetails.value.data?.pickupAddress?.latitude ?? 0.0,
+            orderDetails.value.data?.pickupAddress?.longitude ?? 0.0);
+        if (ongoingOrder.value.duration != null &&
+            ongoingOrder.value.distance != null) {
+          distanceInMeter = double.parse(ongoingOrder.value.distance ?? "0.0");
+          timeInSeconds = double.parse(ongoingOrder.value.duration ?? "0.0");
+        } else {
+          distanceInMeter =
+              calculateDistanceInMeter(riderLocation, destination);
+          if (kDebugMode) {
+            print("distanceInMeter:$distanceInMeter");
+          }
+          timeInSeconds = (90.0 / 1000.0) * distanceInMeter;
+        }
+      }
     } else if (currentStatus == OrderStatus.pickedUp.name ||
         currentStatus == "in_trangite") {
       destinationName.value = "Drop-off Point";
@@ -237,13 +245,16 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
           orderDetails.value.data?.shippingAddress?.latitude ?? 0.0,
           orderDetails.value.data?.shippingAddress?.longitude ?? 0.0);
       riderLocation = LatLng(
-          orderDetails.value.data?.deliveryInfo?.rider?.location?.latitude ?? 0.0,
-          orderDetails.value.data?.deliveryInfo?.rider?.location?.longitude ?? 0.0);
+          orderDetails.value.data?.deliveryInfo?.rider?.location?.latitude ??
+              0.0,
+          orderDetails.value.data?.deliveryInfo?.rider?.location?.longitude ??
+              0.0);
 
-      if (ongoingOrder.value.duration!=null && ongoingOrder.value.distance!=null) {
-        distanceInMeter=double.parse(ongoingOrder.value.distance??"0.0");
-        timeInSeconds=double.parse(ongoingOrder.value.duration??"0.0");
-      }else{
+      if (ongoingOrder.value.duration != null &&
+          ongoingOrder.value.distance != null) {
+        distanceInMeter = double.parse(ongoingOrder.value.distance ?? "0.0");
+        timeInSeconds = double.parse(ongoingOrder.value.duration ?? "0.0");
+      } else {
         distanceInMeter = calculateDistanceInMeter(riderLocation, destination);
         if (kDebugMode) {
           print("distanceInMeter:$distanceInMeter");
@@ -256,7 +267,7 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
       hideFloating();
     }
     getDistanceAndTimeText();
-    progressStatus(currentStatus:currentStatus);
+    progressStatus(currentStatus: currentStatus);
   }
 
   Future<void> getOrderDetails() async {
@@ -266,13 +277,15 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
     try {
       var response = await RemoteServices.getRequest(endPoint: endPoint);
       if (response != null) {
-
         if (kDebugMode) {
           print(response);
         }
         orderDetails.value = OrderDetailsModel.fromJson(response);
-        riderLocation = LatLng(orderDetails.value.data?.deliveryInfo?.rider?.location?.latitude??0.0,
-            orderDetails.value.data?.deliveryInfo?.rider?.location?.longitude??0.0);
+        riderLocation = LatLng(
+            orderDetails.value.data?.deliveryInfo?.rider?.location?.latitude ??
+                0.0,
+            orderDetails.value.data?.deliveryInfo?.rider?.location?.longitude ??
+                0.0);
         destination = LatLng(orderDetails.value.data?.pickupAddress?.latitude,
             orderDetails.value.data?.pickupAddress?.longitude);
       }
@@ -300,7 +313,7 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
         distanceText.value = formatDistance(
           distanceInMeter: distanceInMeter,
         );
-        timeText.value =formatTimeFromSeconds(timeInSeconds.toInt());
+        timeText.value = formatTimeFromSeconds(timeInSeconds.toInt());
       } else {
         distanceText.value = "Almost there";
         timeText.value = "Very soon";
@@ -312,27 +325,40 @@ class FloatingController extends GetxController with WidgetsBindingObserver {
   }
 
   void progressStatus({required String currentStatus}) {
-    if(currentStatus==OrderStatus.pending.name||currentStatus==OrderStatus.searching.name){
-      activeProgress.value=0;
-    }else if(currentStatus==OrderStatus.accepted.name||currentStatus==OrderStatus.reachedAtPickupPoint.name){
-      activeProgress.value=1;
-    }else if(currentStatus==OrderStatus.pickedUp.name){
-      activeProgress.value=2;
-    }else if(currentStatus==OrderStatus.reachedAtDeliveryPoint.name||currentStatus==OrderStatus.delivered.name){
-      activeProgress.value=3;
+    if (currentStatus == OrderStatus.pending.name ||
+        currentStatus == OrderStatus.searching.name) {
+      activeProgress.value = 0;
+    } else if (currentStatus == OrderStatus.accepted.name ||
+        currentStatus == OrderStatus.reachedAtPickupPoint.name) {
+      activeProgress.value = 1;
+    } else if (currentStatus == OrderStatus.pickedUp.name) {
+      activeProgress.value = 2;
+    } else if (currentStatus == OrderStatus.reachedAtDeliveryPoint.name ||
+        currentStatus == OrderStatus.delivered.name) {
+      activeProgress.value = 3;
     }
-
   }
- Future<void> initMessaging()async {
-await getOrderDetails().then((value){
-  Get.put(MessagingController());
-  Get.find<MessagingController>().initValue();
-  Get.find<MessagingController>().orderDetails.value=orderDetails.value;
-  Get.find<MessagingController>().imageLink.value=orderDetails.value.data?.deliveryInfo?.rider?.url??"";
-  Get.find<MessagingController>().chatWith.value=orderDetails.value.data?.deliveryInfo?.rider?.name??"";
-});
 
- }
+  Future<void> initMessaging() async {
+    await getOrderDetails().then((value) {
+      Get.put(MessagingController());
+      Get.find<MessagingController>().initValue();
+      Get
+          .find<MessagingController>()
+          .orderDetails
+          .value = orderDetails.value;
+      Get
+          .find<MessagingController>()
+          .imageLink
+          .value =
+          orderDetails.value.data?.deliveryInfo?.rider?.url ?? "";
+      Get
+          .find<MessagingController>()
+          .chatWith
+          .value =
+          orderDetails.value.data?.deliveryInfo?.rider?.name ?? "";
+    });
+  }
 
   Future<void> cancelOrder() async {
     isLoading.value = true;
@@ -341,23 +367,18 @@ await getOrderDetails().then((value){
         .replaceAll(
         "{orderCancelReasonId}", "${selectedCancelReason.value.id}");
     try {
-      var response=await RemoteServices.putRequest(endPoint: endPoint);
-      if(response!=null){
-
+      var response = await RemoteServices.putRequest(endPoint: endPoint);
+      if (response != null) {
         Get.find<FloatingController>().showFloating();
-        CustomSnackBar(
-            isSuccess: true,
-            msg: response["message"]
-        ).showSnackBar();
+        CustomSnackBar(isSuccess: true, msg: response["message"])
+            .showSnackBar();
         getOrderDetails();
-      }else{
-        CustomSnackBar(
-            isSuccess: true,
-            msg: AppStrings.httpErrorMSG.value
-        ).showSnackBar();
+      } else {
+        CustomSnackBar(isSuccess: true, msg: AppStrings.httpErrorMSG.value)
+            .showSnackBar();
       }
     } finally {
-      isLoading.value=false;
+      isLoading.value = false;
     }
   }
 
@@ -377,9 +398,7 @@ await getOrderDetails().then((value){
   Future<void> callDriver() async {
     final Uri launchUri = Uri(
       scheme: 'tel',
-      path: orderDetails.value.data
-          ?.deliveryInfo?.rider?.phone ??
-          "",
+      path: orderDetails.value.data?.deliveryInfo?.rider?.phone ?? "",
     );
     await launchUrl(launchUri);
   }
@@ -387,37 +406,56 @@ await getOrderDetails().then((value){
   void chatWithDriver() {
     Get.put(MessagingController());
     Get.find<MessagingController>().initValue();
-    Get.find<MessagingController>().orderDetails.value=orderDetails.value;
-    Get.find<MessagingController>().imageLink.value=orderDetails.value.data?.deliveryInfo?.rider?.url??"";
-    Get.find<MessagingController>().chatWith.value=orderDetails.value.data?.deliveryInfo?.rider?.name??"";
+    Get
+        .find<MessagingController>()
+        .orderDetails
+        .value = orderDetails.value;
+    Get
+        .find<MessagingController>()
+        .imageLink
+        .value =
+        orderDetails.value.data?.deliveryInfo?.rider?.url ?? "";
+    Get
+        .find<MessagingController>()
+        .chatWith
+        .value =
+        orderDetails.value.data?.deliveryInfo?.rider?.name ?? "";
     Get.find<MessagingController>().loadPreviousMessage();
     Get.toNamed(Routes.MESSAGING);
   }
 
+  void trackOrderOnMap() async {
+     if (Get.currentRoute != Routes.TRACK_ORDER) {
+      var origin = LatLng(
+          orderDetails.value.data?.pickupAddress?.latitude ?? 0.0,
+          orderDetails.value.data?.pickupAddress?.longitude ?? 0.0);
+      var destination = LatLng(
+          orderDetails.value.data?.shippingAddress?.latitude ?? 0.0,
+          orderDetails.value.data?.shippingAddress?.longitude ?? 0.0);
+      var currentLocation = LatLng(
+          orderDetails.value.data?.deliveryInfo?.rider?.location
+              ?.latitude ??
+              0.0,
+          orderDetails.value.data?.deliveryInfo?.rider?.location
+              ?.longitude ??
+              0.0);
+
+      Get.put(TrackOrderController());
+      Get
+          .find<TrackOrderController>()
+          .orderDetails
+          .value =
+          orderDetails.value;
+      Get.find<TrackOrderController>().generateRoute(
+          origin: origin,
+          destination: destination,
+          riderLocation: currentLocation);
+     // Get.find<TrackOrderController>().setCameraPosition(target: destination);
+      Get.toNamed(Routes.TRACK_ORDER);
+    }
+  }
 }
 
-
-
-
-/*String formatTimeFromSeconds(int totalSeconds) {
-  int hours = totalSeconds ~/ 3600;
-  int minutes = (totalSeconds % 3600) ~/ 60;
-
-  String hoursPart = hours > 0
-      ? "${hours.toString().padLeft(2, '0')} ${hours == 1 ? 'hour' : 'hours'}"
-      : "";
-  String minutesPart = minutes > 0
-      ? "${minutes.toString().padLeft(2, '0')} ${minutes == 1 ? 'minute' : 'minutes'}"
-      : "";
-
-  if (hours > 0 && minutes > 0) {
-    return "$hoursPart $minutesPart";
-  } else if (hours > 0) {
-    return hoursPart;
-  } else {
-    return minutesPart;
-  }
-}*/
 String formatTimeFromSeconds(int totalSeconds) {
   int hours = totalSeconds ~/ 3600;
   int minutes = (totalSeconds % 3600) ~/ 60;

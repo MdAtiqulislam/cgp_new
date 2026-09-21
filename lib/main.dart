@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
@@ -111,18 +112,16 @@ class _MyAppState extends State<MyApp> {
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(
-          locale: const Locale("en","US"),
-          fallbackLocale: const Locale("en","US"),
-          //translations: Languages(),
+          locale: const Locale("en", "US"),
+          fallbackLocale: const Locale("en", "US"),
           debugShowCheckedModeBanner: false,
           initialRoute: AppPages.INITIAL,
           getPages: AppPages.routes,
           theme: CustomTheme.lightTheme,
-          builder: (context,child){
-
+          builder: (context, widget) {
+             widget = EasyLoading.init()(context, widget); // যদি EasyLoading ব্যবহার না করতে চাও
             return Scaffold(
-              //appBar: AppBar(), // the common thing.
-              body: child,
+              body: widget, // GetMaterialApp-এর child widget
               bottomNavigationBar:  FloatingWidget(),
             );
           },
