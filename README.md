@@ -2,6 +2,9 @@
 
 The customer-side Flutter app for the TradeBar platform — browse, order, track and chat.
 
+[![Google Play](https://img.shields.io/badge/Google_Play-Download-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.tradebar.customer) [![App Store](https://img.shields.io/badge/App_Store-Download-0D96F2?style=for-the-badge&logo=app-store&logoColor=white)](https://apps.apple.com/app/id6730116636)
+
+
 ## Features
 
 - Home, category search and location search
