@@ -1,16 +1,47 @@
-# cgp_new
+# TradeBar Customer (cgp_new)
 
-A new Flutter project.
+The customer-side Flutter app for the TradeBar platform — browse, order, track and chat.
+
+## Features
+
+- Home, category search and location search
+- Cart with floating cart button
+- Address management (add/update delivery addresses)
+- Live map view for tracking
+- Auth: login and complete-registration flow
+- Chat history, edit profile, FAQ page
+
+## Tech Stack
+
+- Flutter (Dart)
+- GetX for state management and routing
+- REST API backend
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+Build a release APK:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+flutter build apk --release
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Project Structure
+
+```
+lib/
+├── app/modules/   # Home, cart, search, map, auth, chat, profile
+├── models/        # Data models
+├── services/      # API and platform services
+├── theme/         # App theme
+└── main.dart      # App entry point
+```
+
+## Notes
+
+- App label: "TradeBar Customer" (Android)
+- No secrets or keystores are committed to this repository.
